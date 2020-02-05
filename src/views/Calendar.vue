@@ -16,6 +16,8 @@
       @select="handleDateClick"
       @eventDrop="updateEvent"
       @eventResize="updateEvent"
+       eventColor= '#378006'
+        eventTextColor = "white"
     />
   </div>
 </template>
@@ -45,15 +47,11 @@ export default {
 
   methods: {
     updateEvent(arg) {
-      console.log("Event Drop");
-
       let index = this.events.findIndex(_event => _event.id == arg.event.id);
-
       this.events[index].title = arg.event.title;
       this.events[index].start = arg.event.start;
       this.events[index].end = arg.event.end;
 
-      // this.$store.commit("UPDATE_EVENT", arg.event);
     },
     handleDateClick(arg) {
       this.events.push({
@@ -61,8 +59,12 @@ export default {
         title: "Something",
         start: arg.start,
         end: arg.end,
-        allDay: arg.allDay
+        allDay: arg.allDay,
+       
       });
+      console.log("rerender Events")
+      let calendarApi = this.$refs.fullCalendar.getApi(); // from the ref="..."
+      calendarApi.unselect(); 
     }
   }
 };
