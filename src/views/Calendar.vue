@@ -10,14 +10,16 @@
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
       }"
+      locale="de"
+      locales="de"
       :plugins="calendarPlugins"
       :events="events"
       :selectMirror="true"
       @select="handleDateClick"
       @eventDrop="updateEvent"
       @eventResize="updateEvent"
-       eventColor= '#378006'
-        eventTextColor = "white"
+      eventColor="light-blue"
+      eventTextColor="white"
     />
   </div>
 </template>
@@ -27,6 +29,7 @@ import FullCalendar from "@fullcalendar/vue";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+// import esLocale from '@fullcalendar/core/locales/de';
 
 export default {
   components: {
@@ -44,27 +47,24 @@ export default {
     };
   },
   watch: {},
-
   methods: {
     updateEvent(arg) {
       let index = this.events.findIndex(_event => _event.id == arg.event.id);
       this.events[index].title = arg.event.title;
       this.events[index].start = arg.event.start;
       this.events[index].end = arg.event.end;
-
     },
     handleDateClick(arg) {
       this.events.push({
         id: new Date().getTime(),
-        title: "Something",
+        title: "Arbeit",
         start: arg.start,
         end: arg.end,
-        allDay: arg.allDay,
-       
+        allDay: arg.allDay
       });
-      console.log("rerender Events")
+      console.log("rerender Events");
       let calendarApi = this.$refs.fullCalendar.getApi(); // from the ref="..."
-      calendarApi.unselect(); 
+      calendarApi.unselect();
     }
   }
 };

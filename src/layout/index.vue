@@ -4,7 +4,7 @@
     <!-- Drawer -->
     <Drawer v-model="drawer" />
     <!-- AppBar -->
-    <v-app-bar app absolute color="white" elevate-on-scroll>
+    <v-app-bar  app absolute color="white" elevate-on-scroll>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <!-- <v-toolbar-title>Title</v-toolbar-title> -->
       <v-spacer></v-spacer>
