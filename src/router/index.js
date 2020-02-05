@@ -29,7 +29,31 @@ const routes = [
         path: 'index',
         name: 'Calendar',
         component: () => import('../views/Calendar'),
-        meta: { title: 'Form', icon: 'mdi-calendar-account' }
+        meta: { title: 'Calendar', icon: 'mdi-calendar-account' }
+      }
+    ]
+  },
+  {
+    path: '/table',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Table',
+        component: () => import('../views/DynamicTable'),
+        meta: { title: 'CustomTable', icon: 'mdi-table' }
+      }
+    ]
+  },
+  {
+    path: '/scheduler',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Scheduler',
+        component: () => import('../views/Scheduler'),
+        meta: { title: 'Scheduler', icon: 'mdi-calendar-text' }
       }
     ]
   },
