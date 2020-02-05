@@ -22,14 +22,14 @@ const routes = [
   },
 
   {
-    path: '/test',
+    path: '/calendar',
     component: Layout,
     children: [
       {
         path: 'index',
-        name: 'Form',
-        component: () => import('../views/test'),
-        meta: { title: 'Form', icon: 'mdi-home-city' }
+        name: 'Calendar',
+        component: () => import('../views/Calendar'),
+        meta: { title: 'Form', icon: 'mdi-calendar-account' }
       }
     ]
   },

@@ -50,7 +50,7 @@ const tokens = {
   
     // get user info
     {
-      url: '/vanilla/user/info\.*',
+      url: '/vanilla/user/info.*',
       type: 'get',
       response: config => {
         const { token } = config.query
@@ -75,7 +75,7 @@ const tokens = {
     {
       url: '/vanilla/user/logout',
       type: 'post',
-      response: _ => {
+      response: () => {
         return {
           code: 20000,
           data: 'success'
