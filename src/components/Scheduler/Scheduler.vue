@@ -2,10 +2,10 @@
   <div class="tcontainer">
     <div>
       <v-row align="center">
-        <v-btn icon @click="nextMonth">
+        <v-btn icon @click="prevMonth">
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
-        <v-btn icon @click="nextMonth">
+        <v-btn icon @click="heute">
           <v-icon>mdi-calendar-month</v-icon>
         </v-btn>
 
@@ -23,8 +23,8 @@
             <th class="name_header">Name</th>
             <th v-for="(n,i) in days" :key="i">
               <v-col>
-                {{n}}
-                {{getDayOfWeek(n)}}
+                <v-row align="center" justify="center">{{n}}</v-row>
+                <v-row align="center" justify="center">{{getDayOfWeek(n)}}</v-row>
               </v-col>
             </th>
           </tr>
@@ -60,7 +60,23 @@ export default {
   },
   methods: {
     nextMonth() {
-      this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+      //   this.currentDate = this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+      let oldDate = this.currentDate;
+
+      this.currentDate = new Date(
+        oldDate.getFullYear(),
+        oldDate.getMonth() + 2,
+        0
+      );
+    },
+    heute() {
+      this.currentDate = new Date();
+    },
+    prevMonth() {
+      //   this.currentDate = this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+      let oldDate = this.currentDate;
+
+      this.currentDate = new Date(oldDate.getFullYear(), oldDate.getMonth(), 0);
     },
     hasActiveElements(element, n) {
       return n >= element.abwesenheit.split("-")[0] &&
@@ -75,15 +91,7 @@ export default {
         day
       );
       let weekIndex = date.getDay();
-      let weekMap = {
-        0: "Mo",
-        1: "Di",
-        2: "Mi",
-        3: "Do",
-        4: "Fr",
-        5: "Sa",
-        6: "So"
-      };
+      let weekMap = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
       return weekMap[weekIndex];
     }
   },
@@ -144,7 +152,7 @@ table {
 td,
 th {
   border-right: 1px solid #ccc;
-  min-width: 40px;
+  min-width: 50px;
   text-align: center !important;
 }
 
