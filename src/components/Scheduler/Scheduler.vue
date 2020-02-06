@@ -78,11 +78,17 @@ export default {
 
       this.currentDate = new Date(oldDate.getFullYear(), oldDate.getMonth(), 0);
     },
-    hasActiveElements(element, n) {
-      return n >= element.abwesenheit.split("-")[0] &&
-        n <= element.abwesenheit.split("-")[1]
-        ? { scheduler_active: true }
-        : {};
+    hasActiveElements(element, tag) {
+      // tage zwischen element.start und element.end markieren
+      let n = new Date(
+        this.currentDate.getFullYear(),
+        this.currentDate.getMonth(),
+        tag
+      );
+      let startTime = Date.parse(element.start);
+      let endTime = Date.parse(element.end);
+
+      return n >= startTime && n <= endTime ? { scheduler_active: true } : {};
     },
     getDayOfWeek(day) {
       let date = new Date(
