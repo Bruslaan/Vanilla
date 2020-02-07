@@ -26,15 +26,30 @@ export default {
           name: "Test Peter Hans Jürgen",
           abwesenheit: "12-20",
           events: [
-            { start: "Thu Mar 1 2020", end: "Thu Mar 1 2020" },
+            { start: "Thu Mar 1 2020", end: "Thu Mar 1 2020", type: "Arbeit" },
             { start: "Thu Mar 19 2020", end: "Thu Mar 23 2020" },
             { start: "Thu Mar 12 2020", end: "Thu Mar 16 2020" }
           ]
         },
         {
-          name: "Kartoffel Kopf",
+          name: "Anton Kopf",
           abwesenheit: "12-20",
-          events: [{ start: "Thu Feb 12 2020", end: "Thu Feb 16 2020" }]
+          events: [{ start: "Thu Feb 12 2020", end: "Thu Feb 16 2020", type: "Arbeit"  }]
+        },
+                {
+          name: "Zwiebel Kopf",
+          abwesenheit: "12-20",
+          events: [{ start: "Thu Feb 1 2020", end: "Thu Feb 5 2020" }]
+        },
+                {
+          name: "Oasch Kopf",
+          abwesenheit: "12-20",
+          events: [{ start: "Thu Feb 2 2020", end: "Thu Feb 16 2020" }]
+        },
+                {
+          name: "Käse Kopf",
+          abwesenheit: "12-20",
+          events: [{ start: "Thu Feb 12 2020", end: "Thu Feb 16 2020" }, { start: "Thu Feb 18 2020", end: "Thu Feb 19 2020" }]
         }
       ]
     };
