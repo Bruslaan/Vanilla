@@ -161,6 +161,7 @@ export default {
   text-align: left !important;
 }
 
+
 table {
   position: relative;
   border-collapse: collapse;

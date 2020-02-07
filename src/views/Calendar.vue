@@ -62,7 +62,6 @@ export default {
         end: arg.end,
         allDay: arg.allDay
       });
-      console.log("rerender Events");
       let calendarApi = this.$refs.fullCalendar.getApi(); // from the ref="..."
       calendarApi.unselect();
     }
@@ -70,7 +69,7 @@ export default {
 };
 </script>
 
-<style lang='scss'>
+<style lang='scss' scoped>
 // you must include each plugins' css
 // paths prefixed with ~ signify node_modules
 @import "~@fullcalendar/core/main.css";
