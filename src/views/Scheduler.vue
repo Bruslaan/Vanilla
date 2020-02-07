@@ -17,18 +17,12 @@ export default {
         {
           name: "Test Peter Hans Jürgen",
           abwesenheit: "12-20",
-          start:
-            "Mon Feb 03 2020",
-          end:
-            "Mon Feb 06 2020"
+          events: [{ start: "Thu Mar 1 2020", end: "Thu Mar 6 2020" }, { start: "Thu Mar 19 2020", end: "Thu Mar 23 2020" },{ start: "Thu Mar 12 2020", end: "Thu Mar 16 2020" }]
         },
         {
           name: "Kartoffel Kopf",
           abwesenheit: "12-20",
-          start:
-            "Thu Mar 12 2020",
-          end:
-            "Thu Mar 16 2020"
+          events: [{ start: "Thu Feb 12 2020", end: "Thu Feb 16 2020" }]
         }
       ]
     };

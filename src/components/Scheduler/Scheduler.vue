@@ -37,7 +37,11 @@
               </v-avatar>
               {{element.name}}
             </th>
-            <td v-for="(n,i) in days" :key="i" :class="[ hasActiveElements(element, n) ]"></td>
+            <td
+              v-for="(n,i) in days"
+              :key="i"
+              :class="[ hasActiveElements(element, n) ?  { scheduler_active: true } :{}  ]"
+            ></td>
           </tr>
         </tbody>
       </template>
@@ -85,11 +89,18 @@ export default {
         this.currentDate.getMonth(),
         tag
       );
-      let startTime = Date.parse(element.start);
-      let endTime = Date.parse(element.end);
+      let found = false;
+      for (let index = 0; index < element.events.length; index++) {
+        let startTime = Date.parse(element.events[index]["start"]);
+        let endTime = Date.parse(element.events[index]["end"]);
+        if (n >= startTime && n <= endTime) {
+          found = true;
+        }
+      }
 
-      return n >= startTime && n <= endTime ? { scheduler_active: true } : {};
+      return found;
     },
+
     getDayOfWeek(day) {
       let date = new Date(
         this.currentDate.getFullYear(),
