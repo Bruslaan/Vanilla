@@ -1,6 +1,7 @@
 <template>
   <div class="calenderContainer">
     <FullCalendar
+      height="parent"
       ref="fullCalendar"
       defaultView="timeGridWeek"
       :editable="true"
@@ -80,6 +81,6 @@ export default {
   // font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: 14px;
   // margin-top: 14px;
-  // height: 100vh;
+  height: 90vh !important;
 }
 </style>
