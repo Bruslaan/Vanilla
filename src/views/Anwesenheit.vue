@@ -1,10 +1,19 @@
 <template>
   <div>
     <!-- CALENDAR TOOLBAR -->
-    <v-sheet tile height="54" color="grey lighten-3" class="d-flex">
+    <v-sheet tile height="60" color="grey lighten-3" class="d-flex">
+              <v-toolbar flat color="white">
+      <v-btn outlined class="ma-2" color="grey darken-2" @click="setToday">
+            Today
+          </v-btn>
       <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
+      <v-btn icon class="ma-2" @click="$refs.calendar.next()">
+        <v-icon>mdi-chevron-right</v-icon>
+      </v-btn>
+      <v-toolbar-title class="ma-2">{{ title }}</v-toolbar-title>
+      <v-spacer></v-spacer>
       <v-select
         v-model="type"
         :items="types"
@@ -14,12 +23,7 @@
         class="ma-2"
         label="Ansicht"
       ></v-select>
-      <v-spacer></v-spacer>
-      <v-spacer></v-spacer>
-      <v-spacer></v-spacer>
-      <v-btn icon class="ma-2" @click="$refs.calendar.next()">
-        <v-icon>mdi-chevron-right</v-icon>
-      </v-btn>
+              </v-toolbar>
     </v-sheet>
 
     <!-- CALENDAR -->
@@ -27,7 +31,7 @@
       <v-calendar
         ref="calendar"
         colors
-        v-model="value"
+        v-model="focus"
         :now="today"
         :events="events"
         color="primary"
@@ -40,6 +44,9 @@
         @mouseleave:event="eventLock=false"
         @mousedown:time="startEvent"
         @mouseup:time="endEvent"
+        @mousedown:day="letsTest"
+        @mouseup:day="letsTest"
+        @change="updateRange"
       ></v-calendar>
 
       <!-- EVENT MENU -->
@@ -60,7 +67,7 @@
           </v-toolbar>
 
           <!-- MAYBE DATEPICKER ??????? -->
-          <v-menu
+          <!-- <v-menu
             v-model="picker"
             :close-on-content-click="false"
             :nudge-right="40"
@@ -72,7 +79,7 @@
               <v-text-field v-model="startEventDay" prepend-icon="event" readonly v-on="on"></v-text-field>
             </template>
             <v-date-picker v-model="startEventDay" @input="picker = false"></v-date-picker>
-          </v-menu>
+          </v-menu> -->
 
           <!-- EVENT CONTENT -->
           <v-list-item>Start:</v-list-item>
@@ -123,6 +130,7 @@
 <script>
 export default {
   data: () => ({
+    focus: '',
     type: "week",
     types: ["week", "month"],
     picker: false,
@@ -134,8 +142,17 @@ export default {
     selectedEvent: {},
     selectedElement: null,
     value: "",
+    start: null,
+    end: null,
     weekday: [1, 2, 3, 4, 5, 6, 0],
-    events: []
+    events: [
+      {
+        name: "test",
+        start: "2020-02-03",
+        end: "2020-02-05",
+        color: "rgba(0,0,0,0.2)"
+      }      
+    ],
   }),
 
   computed: {
@@ -206,7 +223,30 @@ export default {
         }
         return "2020-01-01";
       }
-    }
+    },
+    monthFormatter () {
+        return this.$refs.calendar.getFormatter({
+          timeZone: 'UTC', month: 'long',
+        })
+      },
+    title () {
+        const { start, end } = this
+        if (!start || !end) {
+          return ''
+        }
+        const startMonth = this.monthFormatter(start)
+        const startYear = start.year
+        const startDay = start.day
+        switch (this.type) {
+          case 'month':
+            return `${startMonth} ${startYear}`
+          case 'week':
+            return `${startMonth} ${startYear}`
+          case 'day':
+            return `${startMonth} ${startDay} ${startYear}`
+        }
+        return ''
+      }
   },
   methods: {
     SaveEditedEvent() {
@@ -223,7 +263,9 @@ export default {
     getEventColor(event) {
       return event.color;
     },
-
+    setToday () {
+      this.focus = this.today
+    },
     showEvent({ nativeEvent, event }) {
       const open = () => {
         this.selectedEvent = event;
@@ -240,6 +282,9 @@ export default {
       }
 
       nativeEvent.stopPropagation();
+    },
+    letsTest(l) {
+      console.log(l)
     },
     startEvent(time) {
       if (!this.eventLock) {
@@ -267,37 +312,36 @@ export default {
       }
     },
 
-    buildingEvent(time) {
-      if (this.newEvent.start && this.holdingButton) {
-        let timeSplit = time.time.split(":");
-        let newmin = (Math.round(timeSplit[1] / 15) * 15) % 60;
-        if (newmin == "0") {
-          newmin = "00";
-        }
-        let h =
-          timeSplit[1] > 52
-            ? timeSplit[0] === 23
-              ? 0
-              : ++timeSplit[0]
-            : timeSplit[0];
+    buildingEvent() {   //time in den klammern?
+      // if (this.newEvent.start && this.holdingButton) {
+      //   let timeSplit = time.time.split(":");
+      //   let newmin = (Math.round(timeSplit[1] / 15) * 15) % 60;
+      //   if (newmin == "0") {
+      //     newmin = "00";
+      //   }
+      //   let h =
+      //     timeSplit[1] > 52
+      //       ? timeSplit[0] === 23
+      //         ? 0
+      //         : ++timeSplit[0]
+      //       : timeSplit[0];
 
-        let roundedTime = h + ":" + newmin;
+      //   let roundedTime = h + ":" + newmin;
 
-        let newTime = time.date + " " + roundedTime;
+      //   let newTime = time.date + " " + roundedTime;
 
-        let oldEventIndex = this.events.findIndex(x => x.name === "newEvent");
+      //   let oldEventIndex = this.events.findIndex(x => x.name === "newEvent");
 
-        let oldEvent = this.events[
-          this.events.findIndex(x => x.name === "newEvent")
-        ];
-        this.events[this.events.findIndex(x => x.name === "newEvent")][
-          "end"
-        ] = newTime;
-
-        oldEvent["end"] = newTime;
-        this.events.splice(oldEventIndex, 1);
-        this.events.push(oldEvent);
-      }
+      //   let oldEvent = this.events[
+      //     this.events.findIndex(x => x.name === "newEvent")
+      //   ];
+      //   this.events[this.events.findIndex(x => x.name === "newEvent")][
+      //     "end"
+      //   ] = newTime;
+      //   oldEvent["end"] = newTime;
+      //   this.events.splice(oldEventIndex, 1);
+      //   this.events.push(oldEvent);
+      // }
     },
     endEvent(time) {
       if (this.newEvent.start) {
@@ -337,14 +381,18 @@ export default {
         this.events.splice(oldEventIndex, 1);
         this.events.push(oldEvent);
         this.holdingButton = false;
-        // farbe
         this.newEvent = {};
       }
-    }
+    },
+    updateRange ({ start, end }) {
+        this.start = start
+        this.end = end
+      }
   },
 
   mounted() {
     this.$refs.calendar.scrollToTime("08:00");
+    this.$refs.calendar.checkChange();
   }
 };
 </script>
