@@ -2,28 +2,26 @@
   <div>
     <!-- CALENDAR TOOLBAR -->
     <v-sheet tile height="60" color="grey lighten-3" class="d-flex">
-              <v-toolbar flat color="white">
-      <v-btn outlined class="ma-2" color="grey darken-2" @click="setToday">
-            Today
-          </v-btn>
-      <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
-        <v-icon>mdi-chevron-left</v-icon>
-      </v-btn>
-      <v-btn icon class="ma-2" @click="$refs.calendar.next()">
-        <v-icon>mdi-chevron-right</v-icon>
-      </v-btn>
-      <v-toolbar-title class="ma-2">{{ title }}</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-select
-        v-model="type"
-        :items="types"
-        dense
-        outlined
-        hide-details
-        class="ma-2"
-        label="Ansicht"
-      ></v-select>
-              </v-toolbar>
+      <v-toolbar flat color="white">
+        <v-btn outlined class="ma-2" color="grey darken-2" @click="setToday">Today</v-btn>
+        <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+        <v-btn icon class="ma-2" @click="$refs.calendar.next()">
+          <v-icon>mdi-chevron-right</v-icon>
+        </v-btn>
+        <v-toolbar-title class="ma-2">{{ title }}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-select
+          v-model="type"
+          :items="types"
+          dense
+          outlined
+          hide-details
+          class="ma-2"
+          label="Ansicht"
+        ></v-select>
+      </v-toolbar>
     </v-sheet>
 
     <!-- CALENDAR -->
@@ -79,7 +77,7 @@
               <v-text-field v-model="startEventDay" prepend-icon="event" readonly v-on="on"></v-text-field>
             </template>
             <v-date-picker v-model="startEventDay" @input="picker = false"></v-date-picker>
-          </v-menu> -->
+          </v-menu>-->
 
           <!-- EVENT CONTENT -->
           <v-list-item>Start:</v-list-item>
@@ -130,7 +128,7 @@
 <script>
 export default {
   data: () => ({
-    focus: '',
+    focus: "",
     type: "week",
     types: ["week", "month"],
     picker: false,
@@ -151,8 +149,8 @@ export default {
         start: "2020-02-03",
         end: "2020-02-05",
         color: "rgba(0,0,0,0.2)"
-      }      
-    ],
+      }
+    ]
   }),
 
   computed: {
@@ -224,29 +222,30 @@ export default {
         return "2020-01-01";
       }
     },
-    monthFormatter () {
-        return this.$refs.calendar.getFormatter({
-          timeZone: 'UTC', month: 'long',
-        })
-      },
-    title () {
-        const { start, end } = this
-        if (!start || !end) {
-          return ''
-        }
-        const startMonth = this.monthFormatter(start)
-        const startYear = start.year
-        const startDay = start.day
-        switch (this.type) {
-          case 'month':
-            return `${startMonth} ${startYear}`
-          case 'week':
-            return `${startMonth} ${startYear}`
-          case 'day':
-            return `${startMonth} ${startDay} ${startYear}`
-        }
-        return ''
+    monthFormatter() {
+      return this.$refs.calendar.getFormatter({
+        timeZone: "UTC",
+        month: "long"
+      });
+    },
+    title() {
+      const { start, end } = this;
+      if (!start || !end) {
+        return "";
       }
+      const startMonth = this.monthFormatter(start);
+      const startYear = start.year;
+      const startDay = start.day;
+      switch (this.type) {
+        case "month":
+          return `${startMonth} ${startYear}`;
+        case "week":
+          return `${startMonth} ${startYear}`;
+        case "day":
+          return `${startMonth} ${startDay} ${startYear}`;
+      }
+      return "";
+    }
   },
   methods: {
     SaveEditedEvent() {
@@ -263,8 +262,8 @@ export default {
     getEventColor(event) {
       return event.color;
     },
-    setToday () {
-      this.focus = this.today
+    setToday() {
+      this.focus = this.today;
     },
     showEvent({ nativeEvent, event }) {
       const open = () => {
@@ -284,7 +283,7 @@ export default {
       nativeEvent.stopPropagation();
     },
     letsTest(l) {
-      console.log(l)
+      console.log(l);
     },
     startEvent(time) {
       if (!this.eventLock) {
@@ -312,7 +311,8 @@ export default {
       }
     },
 
-    buildingEvent() {   //time in den klammern?
+    buildingEvent() {
+      //time in den klammern?
       // if (this.newEvent.start && this.holdingButton) {
       //   let timeSplit = time.time.split(":");
       //   let newmin = (Math.round(timeSplit[1] / 15) * 15) % 60;
@@ -325,13 +325,9 @@ export default {
       //         ? 0
       //         : ++timeSplit[0]
       //       : timeSplit[0];
-
       //   let roundedTime = h + ":" + newmin;
-
       //   let newTime = time.date + " " + roundedTime;
-
       //   let oldEventIndex = this.events.findIndex(x => x.name === "newEvent");
-
       //   let oldEvent = this.events[
       //     this.events.findIndex(x => x.name === "newEvent")
       //   ];
@@ -384,10 +380,10 @@ export default {
         this.newEvent = {};
       }
     },
-    updateRange ({ start, end }) {
-        this.start = start
-        this.end = end
-      }
+    updateRange({ start, end }) {
+      this.start = start;
+      this.end = end;
+    }
   },
 
   mounted() {
