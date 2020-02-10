@@ -42,8 +42,8 @@
         @mouseleave:event="eventLock=false"
         @mousedown:time="startEvent"
         @mouseup:time="endEvent"
-        @mousedown:day="letsTest"
-        @mouseup:day="letsTest"
+        @mousedown:day="startAlldayEvent"
+        @mouseup:day="endAlldayEvent"
         @change="updateRange"
       ></v-calendar>
 
@@ -59,8 +59,8 @@
           <v-toolbar dark>
             <v-toolbar-title>{{ selectedEvent.name }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon>
-              <v-icon>mdi-dots-vertical</v-icon>
+            <v-btn fab dark small @click="selectedOpen = false">
+              <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-toolbar>
 
@@ -83,7 +83,7 @@
           <v-list-item>Start:</v-list-item>
           <v-list-item>
             <v-icon>mdi-calendar</v-icon>
-            <input class="pa-2" type="date" v-model="startEventDay" />
+            <input class="pa-2" type="date" v-model="startEventDay">
           </v-list-item>
           <v-list-item>
             <v-icon>mdi-clock</v-icon>
@@ -95,12 +95,12 @@
               min="00:00"
               max="23:59"
               v-model="startEventTime"
-            />
+            >
           </v-list-item>
           <v-list-item>End:</v-list-item>
           <v-list-item>
             <v-icon>mdi-calendar</v-icon>
-            <input class="pa-2" type="date" v-model="endEventDay" />
+            <input class="pa-2" type="date" v-model="endEventDay">
           </v-list-item>
           <v-list-item>
             <v-icon>mdi-clock</v-icon>
@@ -112,12 +112,15 @@
               min="00:00"
               max="23:59"
               v-model="endEventTime"
-            />
+            >
           </v-list-item>
 
           <v-card-actions>
-            <v-btn text color="primary" @click="SaveEditedEvent">Save</v-btn>
-            <v-btn text color="secondary" @click="selectedOpen = false">Schließen</v-btn>
+            <v-btn text color="primary" @click="SaveEditedEvent">Speichern</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn dark small class="mr-1" color="red" @click="DeleteEditedEvent">
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-menu>
@@ -128,6 +131,7 @@
 <script>
 export default {
   data: () => ({
+    fab: false,
     focus: "",
     type: "week",
     types: ["week", "month"],
@@ -143,14 +147,7 @@ export default {
     start: null,
     end: null,
     weekday: [1, 2, 3, 4, 5, 6, 0],
-    events: [
-      {
-        name: "test",
-        start: "2020-02-03",
-        end: "2020-02-05",
-        color: "rgba(0,0,0,0.2)"
-      }
-    ]
+    events: []
   }),
 
   computed: {
@@ -256,6 +253,12 @@ export default {
       this.selectedOpen = false;
       // this.events.
     },
+    DeleteEditedEvent() {
+      this.events.splice(this.selectedIndex, 1);
+      this.selectedEvent = {};
+      this.selectedIndex = -1;
+      this.selectedOpen = false;
+    },
     intervalFormat(interval) {
       return interval.time;
     },
@@ -282,8 +285,21 @@ export default {
 
       nativeEvent.stopPropagation();
     },
-    letsTest(l) {
-      console.log(l);
+    startAlldayEvent(event) {
+      if (!this.eventLock) {
+        this.holdingButton = true;
+        this.newEvent["name"] = "Abwesend";
+        this.newEvent["start"] = event.date;
+        this.newEvent["color"] = "rgba(25, 118, 210,1)";
+      }
+    },
+    endAlldayEvent(event) {
+      if (this.holdingButton) {
+        this.holdingButton = false;
+        this.newEvent["end"] = event.date;
+        this.events.push(this.newEvent);
+        this.newEvent = {};
+      }
     },
     startEvent(time) {
       if (!this.eventLock) {
@@ -304,7 +320,7 @@ export default {
         let newTime = time.date + " " + roundedTime;
         this.newEvent["name"] = "newEvent";
         this.newEvent["start"] = newTime;
-        this.newEvent["color"] = "rgba(0,0,0,0.2)";
+        this.newEvent["color"] = "rgba(25, 118, 210,0.2)";
         this.newEvent["end"] = newTime;
         this.events.push(this.newEvent);
         this.holdingButton = true;
@@ -364,7 +380,7 @@ export default {
 
         this.events[this.events.findIndex(x => x.name === "newEvent")][
           "color"
-        ] = this.newEvent["color"] = "rgba(0,0,0,1)";
+        ] = this.newEvent["color"] = "rgba(25, 118, 210,1)";
 
         this.events[this.events.findIndex(x => x.name === "newEvent")][
           "end"
@@ -394,4 +410,9 @@ export default {
 </script>
 
 <style>
+::selection {
+  background-color: initial;
+  color: inherit;
+  text-shadow: initial;
+}
 </style>
