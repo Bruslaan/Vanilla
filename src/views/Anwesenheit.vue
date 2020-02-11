@@ -54,10 +54,19 @@
         :activator="selectedElement"
         offset-x
       >
-        <v-card color="grey lighten-4" min-width="350px" flat>
+        <v-card color="grey lighten-4" flat>
           <!-- EVENT TITLE TOOLBAR -->
           <v-toolbar dark>
-            <v-toolbar-title>{{ selectedEvent.name }}</v-toolbar-title>
+            <!-- <v-toolbar-title>{{ selectedEvent.name }}</v-toolbar-title> -->
+            <v-select
+              v-model="was"
+              :items="was2"
+              dense
+              outlined
+              hide-details
+              class="mr-5"
+              label="Erfassung"
+            ></v-select>
             <v-spacer></v-spacer>
             <v-btn fab dark small @click="selectedOpen = false">
               <v-icon>mdi-close</v-icon>
@@ -80,41 +89,70 @@
           </v-menu>-->
 
           <!-- EVENT CONTENT -->
-          <v-list-item>Start:</v-list-item>
-          <v-list-item>
-            <v-icon>mdi-calendar</v-icon>
-            <input class="pa-2" type="date" v-model="startEventDay">
-          </v-list-item>
-          <v-list-item>
-            <v-icon>mdi-clock</v-icon>
-            <input
-              class="pa-2"
-              type="time"
-              id="appt"
-              name="appt"
-              min="00:00"
-              max="23:59"
-              v-model="startEventTime"
-            >
-          </v-list-item>
-          <v-list-item>End:</v-list-item>
-          <v-list-item>
-            <v-icon>mdi-calendar</v-icon>
-            <input class="pa-2" type="date" v-model="endEventDay">
-          </v-list-item>
-          <v-list-item>
-            <v-icon>mdi-clock</v-icon>
-            <input
-              class="pa-2"
-              type="time"
-              id="appt"
-              name="appt"
-              min="00:00"
-              max="23:59"
-              v-model="endEventTime"
-            >
-          </v-list-item>
+          <v-expand-transition>
+            <v-row v-if="was=='Abwesenheit'">
+              <v-col cols="6">
+                <v-list-item>
+                  <v-select
+                    v-model="grund"
+                    :items="gruende"
+                    dense
+                    outlined
+                    hide-details
+                    class="mr-5"
+                    label="Grund"
+                  ></v-select>
+                </v-list-item>
+              </v-col>
+            </v-row>
+          </v-expand-transition>
 
+          <v-row>
+            <v-col cols="2">
+              <v-list-item>Start:</v-list-item>
+            </v-col>
+            <v-col cols="10">
+              <v-list-item>
+                <v-icon>mdi-calendar</v-icon>
+                <input class="pa-2" type="date" v-model="startEventDay">
+              </v-list-item>
+              <v-list-item v-if="was=='Anwesenheit'">
+                <v-icon>mdi-clock</v-icon>
+                <input
+                  class="pa-2"
+                  type="time"
+                  id="appt"
+                  name="appt"
+                  min="00:00"
+                  max="23:59"
+                  v-model="startEventTime"
+                >
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="2">
+              <v-list-item>Ende:</v-list-item>
+            </v-col>
+            <v-col cols="10">
+              <v-list-item>
+                <v-icon>mdi-calendar</v-icon>
+                <input class="pa-2" type="date" v-model="endEventDay">
+              </v-list-item>
+              <v-list-item v-if="was=='Anwesenheit'">
+                <v-icon>mdi-clock</v-icon>
+                <input
+                  class="pa-2"
+                  type="time"
+                  id="appt"
+                  name="appt"
+                  min="00:00"
+                  max="23:59"
+                  v-model="endEventTime"
+                >
+              </v-list-item>
+            </v-col>
+          </v-row>
           <v-card-actions>
             <v-btn text color="primary" @click="SaveEditedEvent">Speichern</v-btn>
             <v-spacer></v-spacer>
@@ -133,6 +171,10 @@ export default {
   data: () => ({
     fab: false,
     focus: "",
+    grund: "Urlaub",
+    gruende: ["Urlaub", "Krankheit", "Feiertag"],
+    was: "Anwesenheit",
+    was2: ["Anwesenheit", "Abwesenheit"],
     type: "week",
     types: ["week", "month"],
     picker: false,
@@ -162,8 +204,7 @@ export default {
       get: function() {
         if (this.selectedEvent.start) {
           let selectedEventStartTime = this.selectedEvent.start.split(" ");
-
-          return selectedEventStartTime[1];
+          return selectedEventStartTime[1] || "08:00";
         }
         return "00:00";
       }
@@ -179,8 +220,7 @@ export default {
       get: function() {
         if (this.selectedEvent.end) {
           let selectedEventStartTime = this.selectedEvent.end.split(" ");
-
-          return selectedEventStartTime[1];
+          return selectedEventStartTime[1] || "12:00";
         }
         return "00:00";
       }
@@ -246,7 +286,30 @@ export default {
   },
   methods: {
     SaveEditedEvent() {
+      if (this.was == "Abwesenheit") {
+        console.log(this.selectedEvent);
+
+        try {
+          this.selectedEvent.start = this.selectedEvent.start.split(" ")[0];
+          this.selectedEvent.end = this.selectedEvent.end.split(" ")[0];
+        } catch {
+          console.log("es gibt kein split");
+        }
+        console.log("vor", this.selectedEvent);
+
+        this.selectedEvent.name = this.grund;
+      }
+      if (this.was == "Anwesenheit") {
+        this.selectedEvent.name = "Arbeit";
+        this.selectedEvent.start =
+          this.selectedEvent.start.split(" ")[0] + " " + this.startEventTime;
+        this.selectedEvent.end =
+          this.selectedEvent.end.split(" ")[0] + " " + this.endEventTime;
+      }
+      this.selectedEvent.art = this.was;
       this.events.splice(this.selectedIndex, 1);
+      console.log("nach", this.selectedEvent);
+
       this.events.push(this.selectedEvent);
       this.selectedEvent = {};
       this.selectedIndex = -1;
@@ -269,6 +332,7 @@ export default {
       this.focus = this.today;
     },
     showEvent({ nativeEvent, event }) {
+      this.was = event.art;
       const open = () => {
         this.selectedEvent = event;
         this.selectedIndex = this.events.indexOf(event);
@@ -288,7 +352,8 @@ export default {
     startAlldayEvent(event) {
       if (!this.eventLock) {
         this.holdingButton = true;
-        this.newEvent["name"] = "Abwesend";
+        this.newEvent["art"] = "Abwesenheit";
+        this.newEvent["name"] = "Urlaub";
         this.newEvent["start"] = event.date;
         this.newEvent["color"] = "rgba(25, 118, 210,1)";
       }
@@ -318,6 +383,7 @@ export default {
         let roundedTime = h + ":" + newmin;
 
         let newTime = time.date + " " + roundedTime;
+        this.newEvent["art"] = "Anwesenheit";
         this.newEvent["name"] = "newEvent";
         this.newEvent["start"] = newTime;
         this.newEvent["color"] = "rgba(25, 118, 210,0.2)";
