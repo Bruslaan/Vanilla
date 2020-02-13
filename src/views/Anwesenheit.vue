@@ -3,10 +3,11 @@
     <!-- CALENDAR TOOLBAR -->
     <v-sheet tile height="60" color="grey lighten-3" class="d-flex">
       <v-toolbar flat color="white">
-        <v-btn outlined class="ma-2" color="grey darken-2" @click="setToday">Today</v-btn>
+       
         <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
+         <v-btn text class="ma-2" color="grey darken-2" @click="setToday">Today</v-btn>
         <v-btn icon class="ma-2" @click="$refs.calendar.next()">
           <v-icon>mdi-chevron-right</v-icon>
         </v-btn>

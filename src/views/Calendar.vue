@@ -1,240 +1,362 @@
 <template>
-  <div class="calenderContainer">
-    <!-- Modal -->
-
-    <v-dialog v-model="modalOpen" persistent max-width="350px">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Abwesenheit</span>
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12" sm="12">
-                <v-select :items="['Urlaub','Krankheit','Feiertag']" label="Grund" required></v-select>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-menu
-                  ref="menu"
-                  v-model="menu"
-                  :close-on-content-click="false"
-                  :return-value.sync="dates"
-                  transition="scale-transition"
-                  offset-y
-                  min-width="290px"
-                >
-                  <template v-slot:activator="{ on }">
-                    <v-text-field v-model="dateRangeText" label="Datum" readonly v-on="on"></v-text-field>
-                  </template>
-                  <v-date-picker range v-model="dates" no-title scrollable>
-                    <v-spacer></v-spacer>
-                    <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
-                    <v-btn text color="primary" @click="$refs.menu.save(dates)">OK</v-btn>
-                  </v-date-picker>
-                </v-menu>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
+  <v-row class="fill-height">
+    <v-col>
+      <v-sheet height="64">
+        <v-toolbar flat color="white">
+          <v-btn fab text small color="grey darken-2" @click="prev">
+            <v-icon small>mdi-chevron-left</v-icon>
+          </v-btn>
+          <v-btn text color="grey darken-2" @click="setToday">Today</v-btn>
+          <v-btn fab text small color="grey darken-2" @click="next">
+            <v-icon small>mdi-chevron-right</v-icon>
+          </v-btn>
+          <v-toolbar-title>{{ title }}</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="modalOpen = false">Close</v-btn>
-          <v-btn color="blue darken-1" text @click="newEventSaved">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+          <v-menu bottom right>
+            <template v-slot:activator="{ on }">
+              <v-btn outlined color="grey darken-2" v-on="on">
+                <span>{{ typeToLabel[type] }}</span>
+                <v-icon right>mdi-menu-down</v-icon>
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item @click="type = 'week'">
+                <v-list-item-title>Week</v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="type = 'month'">
+                <v-list-item-title>Month</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </v-toolbar>
+      </v-sheet>
+      <v-sheet height="600">
+        <v-calendar
+          ref="calendar"
+          v-model="focus"
+          color="primary"
+          :events="events"
+          :event-color="getEventColor"
+          :now="today"
+          :type="type"
+          :weekdays="weekday"
+          @click:event="showEvent"
+          @change="updateRange"
+          @mousedown:time="startCreating"
+          @mouseenter:event="eventHovered=true"
+          @mouseleave:event="eventHovered=false"
+        ></v-calendar>
 
-    <FullCalendar
-      height="parent"
-      ref="fullCalendar"
-      defaultView="timeGridWeek"
-      :editable="true"
-      :selectable="true"
-      :header="{
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-      }"
-      locale="de"
-      locales="de"
-      :plugins="calendarPlugins"
-      :events="events"
-      :selectMirror="true"
-      @select="handleDateClick"
-      @eventDrop="updateEvent"
-      @eventResize="updateEvent"
-      @eventClick="handleEventClick"
-      eventColor="light-blue"
-      eventTextColor="white"
-    />
-  </div>
+        <!-- EVENT MENU -->
+        <v-menu v-model="selectedOpen" :close-on-content-click="false" offset-x>
+          <v-card color="grey lighten-4" flat>
+            <!-- EVENT TITLE TOOLBAR -->
+            <v-toolbar dark>
+              <!-- <v-toolbar-title>{{ selectedEvent.name }}</v-toolbar-title> -->
+              <v-select
+                v-model="selectedEvent.type"
+                :items="types"
+                dense
+                outlined
+                hide-details
+                class="mr-5"
+                label="Erfassung"
+              ></v-select>
+              <v-spacer></v-spacer>
+              <v-btn fab dark small @click="clearAndCloseModal">
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </v-toolbar>
+            <v-expand-transition>
+              <v-row v-if="selectedEvent.type=='Abwesenheit'">
+                <v-col cols="6">
+                  <v-list-item>
+                    <v-select
+                      v-model="selectedEvent.abwesenheitsGrund"
+                      :items="abwesenheitsGrund"
+                      dense
+                      outlined
+                      hide-details
+                      class="mr-5"
+                      label="Grund"
+                    ></v-select>
+                  </v-list-item>
+                </v-col>
+              </v-row>
+            </v-expand-transition>
+            <v-row>
+              <v-col cols="2">
+                <v-list-item>Start:</v-list-item>
+              </v-col>
+              <v-col cols="10">
+                <v-list-item>
+                  <v-icon>mdi-calendar</v-icon>
+                  <input class="pa-2" type="date" v-model="selectedEvent.startDay" />
+                </v-list-item>
+                <v-list-item v-if="selectedEvent.type =='Anwesenheit'">
+                  <v-icon>mdi-clock</v-icon>
+                  <input
+                    class="pa-2"
+                    type="time"
+                    id="appt"
+                    name="appt"
+                    min="00:00"
+                    max="23:59"
+                    v-model="selectedEvent.startTime"
+                  />
+                </v-list-item>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="2">
+                <v-list-item>Ende:</v-list-item>
+              </v-col>
+              <v-col cols="10">
+                <v-list-item>
+                  <v-icon>mdi-calendar</v-icon>
+                  <input class="pa-2" type="date" v-model="selectedEvent.endDay" />
+                </v-list-item>
+                <v-list-item v-if="selectedEvent.type =='Anwesenheit'">
+                  <v-icon>mdi-clock</v-icon>
+                  <input
+                    class="pa-2"
+                    type="time"
+                    id="appt"
+                    name="appt"
+                    min="00:00"
+                    max="23:59"
+                    v-model="selectedEvent.endTime"
+                  />
+                </v-list-item>
+              </v-col>
+            </v-row>
+            <v-card-actions>
+              <v-btn text color="primary" @click="updateEvent">Speichern</v-btn>
+              <v-spacer></v-spacer>
+              <v-btn dark small class="mr-1" color="red" @click="deleteEvent">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-menu>
+      </v-sheet>
+    </v-col>
+  </v-row>
 </template>
 
-<script>
-import FullCalendar from "@fullcalendar/vue";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-// import CalendarModal from "../components/Calendar/CalendarModal";
-// import esLocale from '@fullcalendar/core/locales/de';
 
+<script>
 export default {
-  components: {
-    FullCalendar
-    // CalendarModal // make the <FullCalendar> tag available
-  },
-  data: function() {
-    return {
-      modalOpen: false,
-      events: [],
-      calendarPlugins: [
-        // plugins must be defined in the JS
-        dayGridPlugin,
-        timeGridPlugin,
-        interactionPlugin // needed for dateClick
-      ],
-      selectedEvent: null,
-      dates: ["2019-09-10", "2019-09-20"],
-      menu: false,
-      modal: false,
-      menu2: false,
-      editedIndex: -1
-    };
-  },
+  data: () => ({
+    weekday: [1, 2, 3, 4, 5, 6, 0],
+    focus: "",
+    type: "week",
+    abwesenheitsGrund: ["Urlaub", "Krankheit", "Feiertag"],
+    types: ["Abwesenheit", "Anwesenheit"],
+
+    typeToLabel: {
+      month: "Month",
+      week: "Week",
+      day: "Day",
+      "4day": "4 Days"
+    },
+    start: null,
+    end: null,
+    selectedEvent: {},
+    selectedEventIndex: -1,
+    selectedElement: null,
+    selectedOpen: false,
+    renderEvent: false,
+    eventToRender: null,
+    eventHovered: false,
+    events: [
+      {
+        name: "Weekly Meeting",
+        start: "2020-02-11",
+        end: "2020-02-12",
+        color: "primary",
+        type: "Abwesenheit"
+      },
+      {
+        name: "Weekly Meeting",
+        start: "2020-02-13 12:00",
+        end: "2020-02-13 13:00",
+        color: "primary",
+        type: "Anwesenheit"
+      }
+    ],
+    colors: [
+      "blue",
+      "indigo",
+      "deep-purple",
+      "cyan",
+      "green",
+      "orange",
+      "grey darken-1"
+    ],
+    names: ["Meeting"]
+  }),
+
   computed: {
-    dateRangeText() {
-      return this.dates.join(" bis ");
+    title() {
+      const { start, end } = this;
+      if (!start || !end) {
+        return "";
+      }
+
+      const startMonth = this.monthFormatter(start);
+
+      const startYear = start.year;
+      const startDay = start.day;
+      switch (this.type) {
+        case "month":
+          return `${startMonth} ${startYear}`;
+        case "week":
+          return `${startMonth} ${startYear}`;
+        case "day":
+          return `${startMonth} ${startDay} ${startYear}`;
+      }
+      return "";
+    },
+    monthFormatter() {
+      return this.$refs.calendar.getFormatter({
+        timeZone: "UTC",
+        month: "long"
+      });
     }
   },
-  watch: {},
+  mounted() {
+    this.$refs.calendar.checkChange();
+  },
   methods: {
-    editItem(item) {
-      this.editedIndex = this.events.indexOf(item);
-      this.selectedEvent = Object.assign({}, item);
-      this.dialog = true;
-    },
-
-    deleteItem(item) {
-      const index = this.events.indexOf(item);
-      confirm("Are you sure you want to delete this item?") &&
-        this.events.splice(index, 1);
-    },
-
-    close() {
-      this.dialog = false;
-      setTimeout(() => {
-        this.selectedEvent = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      }, 300);
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.events[this.editedIndex], this.selectedEvent);
-      } else {
-        this.events.push(this.selectedEvent);
+    startCreating({ date, time }) {
+      if (this.eventHovered) {
+        return;
       }
-      this.close();
+      let newEvent = {
+        name: "Weekly Meeting",
+        start: [date, time].join(" "),
+        end: [date, time].join(" "),
+        color: "primary"
+      };
+      this.events.push(newEvent);
+
+      this.renderEvent = true;
     },
-
-    newEventSaved() {
-      console.log(this.dates);
-
-      this.selectedEvent.start.setYear(this.dates[0].split("-")[0]);
-      this.selectedEvent.start.setMonth(this.dates[0].split("-")[1] - 1);
-      this.selectedEvent.start.setDate(this.dates[0].split("-")[2]);
-
-      this.selectedEvent.end.setYear(this.dates[1].split("-")[0]);
-      this.selectedEvent.end.setMonth(this.dates[1].split("-")[1] - 1);
-      this.selectedEvent.end.setDate(this.dates[1].split("-")[2]);
-
-      Object.assign(this.events[this.editedIndex], this.selectedEvent);
-      this.modalOpen = false
-      console.log(this.events);
+    // renderCreating({ nativeEvent }) {
+    //   if (this.renderEvent) {
+    //     this.eventToRender = nativeEvent.target;
+    //     this.eventToRender.style.height = "100px";
+    //     console.log(this.eventToRender);
+    //   }
+    // },
+    endCreating() {
+      this.renderEvent = false;
     },
-    handleEventClick(e) {
-      this.modalOpen = true;
-      let editedEvent = {
-        id: e.event.id,
-        title: e.event.title,
-        start: e.event.start,
-        end: e.event.end,
-        allDay: true
+    // is triggered when new Calender week is renderd
+    updateRange({ start, end }) {
+      this.start = start;
+      this.end = end;
+    },
+    viewDay({ date }) {
+      this.focus = date;
+      this.type = "day";
+    },
+    getEventColor(event) {
+      return event.color;
+    },
+    setToday() {
+      this.focus = this.today;
+    },
+    prev() {
+      this.$refs.calendar.prev();
+    },
+    next() {
+      this.$refs.calendar.next();
+    },
+    splitDayAndTime(dateTime) {
+      let splittedDateTime = dateTime.split(" ");
+
+      return [splittedDateTime[0], splittedDateTime[1]];
+    },
+    showEvent({ nativeEvent, event }) {
+      const open = () => {
+        this.selectedEvent = event;
+        this.selectedEventIndex = this.events.indexOf(event);
+        this.selectedElement = nativeEvent.target;
+        let startDateTime = this.splitDayAndTime(this.selectedEvent.start);
+        let endDateTime = this.splitDayAndTime(this.selectedEvent.end);
+
+        this.selectedEvent["startDay"] = startDateTime[0];
+        this.selectedEvent["endDay"] = endDateTime[0];
+        this.selectedEvent["startTime"] = startDateTime[1];
+        this.selectedEvent["endTime"] = endDateTime[1];
+
+        setTimeout(() => (this.selectedOpen = true), 10);
       };
 
-      console.log(this.findWithAttr(this.events, "id", e.event.id));
-      this.editedIndex = this.findWithAttr(this.events, "id", e.event.id);
-
-      this.selectedEvent = Object.assign({}, editedEvent);
-      // dates überschreiben
-
-      let selectedEventDateStart = this.selectedEvent.start;
-      let selectedEventDateEnd = this.selectedEvent.end;
-
-      let startYear = selectedEventDateStart.getFullYear();
-      let startMonth = selectedEventDateStart.getMonth() + 1;
-      let startDay = selectedEventDateStart.getDate();
-
-      let endYear = selectedEventDateEnd.getFullYear();
-      let endMonth = selectedEventDateEnd.getMonth() + 1;
-      let endDay = selectedEventDateEnd.getDate() - 1;
-
-      if (startMonth < 10) startMonth = "0" + startMonth;
-      if (startDay < 10) startDay = "0" + startDay;
-      if (endMonth < 10) endMonth = "0" + endMonth;
-      if (endDay < 10) endDay = "0" + endDay;
-
-      let start = [startYear, startMonth, startDay].join("-");
-      let end = [endYear, endMonth, endDay].join("-");
-
-      this.dates = [start, end];
-    },
-    updateEvent(arg) {
-      let index = this.events.findIndex(_event => _event.id == arg.event.id);
-      this.events[index].title = arg.event.title;
-      this.events[index].start = arg.event.start;
-      this.events[index].end = arg.event.end;
-    },
-    handleDateClick(arg) {
-      this.events.push({
-        id: new Date().getTime(),
-        title: "Arbeit",
-        start: arg.start,
-        end: arg.end,
-        allDay: arg.allDay
-      });
-      let calendarApi = this.$refs.fullCalendar.getApi(); // from the ref="..."
-      calendarApi.unselect();
-    },
-    findWithAttr(array, attr, value) {
-      console.log(array);
-
-      for (var i = 0; i < array.length; i += 1) {
-        console.log(array[i][attr]);
-        console.log(value);
-        if (array[i][attr] == value) {
-          return i;
-        }
+      if (this.selectedOpen) {
+        this.selectedOpen = false;
+        setTimeout(open, 10);
+      } else {
+        open();
       }
-      return -2;
+
+      nativeEvent.stopPropagation();
+    },
+    deleteEvent() {
+      if (this.selectedEvent && this.selectedEventIndex != -1) {
+        this.events.splice(this.selectedEventIndex, 1);
+        this.clearAndCloseModal();
+      }
+    },
+    clearAndCloseModal() {
+      this.selectedOpen = false;
+      this.selectedEventIndex = -1;
+      this.selectedEvent = {};
+      this.selectedElement = null;
+    },
+    validateAnwesenheit() {
+      console.log(this.selectedEvent.startTime);
+      if (this.selectedEvent.startTime && this.selectedEvent.endTime) {
+        return true;
+      }
+      return false;
+    },
+    updateEvent() {
+      let startTime;
+      let endTime;
+
+      if (
+        this.selectedEvent.type == "Anwesenheit" &&
+        this.validateAnwesenheit()
+      ) {
+        startTime = [
+          this.selectedEvent.startDay,
+          this.selectedEvent.startTime
+        ].join(" ");
+        endTime = [this.selectedEvent.endDay, this.selectedEvent.endTime].join(
+          " "
+        );
+      } else {
+        console.log("bin hier drinn");
+        startTime = this.selectedEvent.startDay;
+        endTime = this.selectedEvent.endDay;
+      }
+
+      let updatedEvent = {
+        name: "Weekly Meeting",
+        start: startTime,
+        end: endTime,
+        color: "red",
+        type: this.selectedEvent.type,
+        abwesenheitsGrund: this.selectedEvent.abwesenheitsGrund
+      };
+      this.events.splice(this.selectedEventIndex, 1);
+      this.events.push(updatedEvent);
+
+      this.clearAndCloseModal();
     }
   }
 };
 </script>
-
-<style lang='scss' scoped>
-// you must include each plugins' css
-// paths prefixed with ~ signify node_modules
-@import "~@fullcalendar/core/main.css";
-@import "~@fullcalendar/daygrid/main.css";
-@import "~@fullcalendar/timegrid/main.css";
-
-.calenderContainer {
-  // font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 14px;
-  // margin-top: 14px;
-  height: 90vh !important;
-}
-</style>
