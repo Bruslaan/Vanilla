@@ -43,6 +43,7 @@
           @click:event="showEvent"
           @change="updateRange"
           @mousedown:time="startCreating"
+          @mouseup:time="endCreating"
           @mouseenter:event="eventHovered=true"
           @mouseleave:event="eventHovered=false"
         ></v-calendar>
@@ -234,23 +235,17 @@ export default {
         return;
       }
       let newEvent = {
-        name: "Weekly Meeting",
+        name: "New Event",
         start: [date, time].join(" "),
         end: [date, time].join(" "),
-        color: "primary"
+        color: "primary",
+        type: "Anwesenheit"
       };
       this.events.push(newEvent);
-
       this.renderEvent = true;
     },
-    // renderCreating({ nativeEvent }) {
-    //   if (this.renderEvent) {
-    //     this.eventToRender = nativeEvent.target;
-    //     this.eventToRender.style.height = "100px";
-    //     console.log(this.eventToRender);
-    //   }
-    // },
-    endCreating() {
+    endCreating(time) {
+      console.log("time", time);
       this.renderEvent = false;
     },
     // is triggered when new Calender week is renderd
