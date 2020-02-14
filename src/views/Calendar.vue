@@ -145,7 +145,7 @@
             <v-card-actions>
               <v-btn text color="primary" @click="updateEvent">Speichern</v-btn>
               <v-spacer></v-spacer>
-              <v-btn v-if="!dontShowDelete" dark fab small class="mr-1" color="red" @click="deleteEvent">
+              <v-btn v-if="selectedEventIndex != -1" dark fab small class="mr-1" color="red" @click="deleteEvent">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </v-card-actions>
@@ -181,7 +181,6 @@ export default {
     renderEvent: false,
     eventToRender: null,
     eventHovered: false,
-    dontShowDelete: false, 
     events: [
       {
         name: "Weekly Meeting",
@@ -249,7 +248,7 @@ export default {
   methods: {
     createEvent() {
       this.selectedOpen = true;
-      this.dontShowDelete = true;
+      
     },
     startCreating({ date, time }) {
       if (this.eventHovered) {
@@ -331,7 +330,7 @@ export default {
       this.selectedEventIndex = -1;
       this.selectedEvent = {};
       this.selectedElement = null;
-      this.dontShowDelete = false;
+      
     },
     validateAnwesenheit() {
       if (this.selectedEvent.startTime && this.selectedEvent.endTime) {
