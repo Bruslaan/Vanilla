@@ -1,5 +1,16 @@
 <template>
   <v-row class="fill-height">
+    <v-btn
+      class="floating_action_button mb-12"
+      @click="createEvent"
+      dark
+      fab
+      bottom
+      right
+      color="red"
+    >
+      <v-icon>mdi-plus</v-icon>
+    </v-btn>
     <v-col>
       <v-sheet height="64">
         <v-toolbar flat color="white">
@@ -49,7 +60,7 @@
         ></v-calendar>
 
         <!-- EVENT MENU -->
-        <v-menu v-model="selectedOpen" :close-on-content-click="false" offset-x>
+        <v-dialog v-model="selectedOpen" width="500">
           <v-card color="grey lighten-4" flat>
             <!-- EVENT TITLE TOOLBAR -->
             <v-toolbar dark>
@@ -64,12 +75,12 @@
                 label="Erfassung"
               ></v-select>
               <v-spacer></v-spacer>
-              <v-btn fab dark small @click="clearAndCloseModal">
+              <v-btn text fab dark small @click="clearAndCloseModal">
                 <v-icon>mdi-close</v-icon>
               </v-btn>
             </v-toolbar>
             <v-expand-transition>
-              <v-row v-if="selectedEvent.type=='Abwesenheit'">
+              <v-row v-show="selectedEvent.type=='Abwesenheit'">
                 <v-col cols="6">
                   <v-list-item>
                     <v-select
@@ -134,12 +145,12 @@
             <v-card-actions>
               <v-btn text color="primary" @click="updateEvent">Speichern</v-btn>
               <v-spacer></v-spacer>
-              <v-btn dark small class="mr-1" color="red" @click="deleteEvent">
+              <v-btn v-if="!dontShowDelete" dark fab small class="mr-1" color="red" @click="deleteEvent">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </v-card-actions>
           </v-card>
-        </v-menu>
+        </v-dialog>
       </v-sheet>
     </v-col>
   </v-row>
@@ -170,6 +181,7 @@ export default {
     renderEvent: false,
     eventToRender: null,
     eventHovered: false,
+    dontShowDelete: false, 
     events: [
       {
         name: "Weekly Meeting",
@@ -198,6 +210,11 @@ export default {
     names: ["Meeting"]
   }),
 
+  watch: {
+    selectedOpen(val) {
+      val || this.clearAndCloseModal();
+    }
+  },
   computed: {
     title() {
       const { start, end } = this;
@@ -230,6 +247,10 @@ export default {
     this.$refs.calendar.checkChange();
   },
   methods: {
+    createEvent() {
+      this.selectedOpen = true;
+      this.dontShowDelete = true;
+    },
     startCreating({ date, time }) {
       if (this.eventHovered) {
         return;
@@ -244,8 +265,8 @@ export default {
       this.events.push(newEvent);
       this.renderEvent = true;
     },
-    endCreating(time) {
-      console.log("time", time);
+    endCreating() {
+      // console.log("time", time);
       this.renderEvent = false;
     },
     // is triggered when new Calender week is renderd
@@ -310,9 +331,9 @@ export default {
       this.selectedEventIndex = -1;
       this.selectedEvent = {};
       this.selectedElement = null;
+      this.dontShowDelete = false;
     },
     validateAnwesenheit() {
-      console.log(this.selectedEvent.startTime);
       if (this.selectedEvent.startTime && this.selectedEvent.endTime) {
         return true;
       }
@@ -334,7 +355,6 @@ export default {
           " "
         );
       } else {
-        console.log("bin hier drinn");
         startTime = this.selectedEvent.startDay;
         endTime = this.selectedEvent.endDay;
       }
@@ -355,3 +375,13 @@ export default {
   }
 };
 </script>
+
+<style  scoped>
+.floating_action_button {
+  position: absolute;
+  bottom: 0px;
+  right: 28px;
+  transform: translate(0px, -28px);
+  z-index: 900;
+}
+</style>

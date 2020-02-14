@@ -57,18 +57,18 @@ const routes = [
       }
     ]
   },
-  {
-    path: '/anwesenheit',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Anwesenheit',
-        component: () => import('../views/Anwesenheit'),
-        meta: { title: 'Anwesenheit', icon: 'mdi-calendar-text' }
-      }
-    ]
-  },
+  // {
+  //   path: '/anwesenheit',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'Anwesenheit',
+  //       component: () => import('../views/Anwesenheit'),
+  //       meta: { title: 'Anwesenheit', icon: 'mdi-calendar-text' }
+  //     }
+  //   ]
+  // },
   {
     path: '/login',
     name: 'login',
