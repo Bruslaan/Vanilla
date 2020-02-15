@@ -1,5 +1,11 @@
 <template>
   <v-row class="fill-height">
+    <!-- SnackBar -->
+    <v-snackbar color="red" v-model="snackbar">
+      {{ text }}
+      <v-btn color="white" text @click="snackbar = false">Close</v-btn>
+    </v-snackbar>
+    <!-- SnackBar -->
     <v-btn
       class="floating_action_button mb-12"
       @click="createEvent"
@@ -79,8 +85,9 @@
                 <v-icon>mdi-close</v-icon>
               </v-btn>
             </v-toolbar>
+
             <v-expand-transition>
-              <v-row v-show="selectedEvent.type=='Abwesenheit'">
+              <v-row v-if="selectedEvent.type=='Abwesenheit'">
                 <v-col cols="6">
                   <v-list-item>
                     <v-select
@@ -145,7 +152,15 @@
             <v-card-actions>
               <v-btn text color="primary" @click="updateEvent">Speichern</v-btn>
               <v-spacer></v-spacer>
-              <v-btn v-if="selectedEventIndex != -1" dark fab small class="mr-1" color="red" @click="deleteEvent">
+              <v-btn
+                v-if="selectedEventIndex != -1"
+                dark
+                fab
+                small
+                class="mr-1"
+                color="red"
+                @click="deleteEvent"
+              >
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </v-card-actions>
@@ -165,13 +180,14 @@ export default {
     type: "week",
     abwesenheitsGrund: ["Urlaub", "Krankheit", "Feiertag"],
     types: ["Abwesenheit", "Anwesenheit"],
-
+    text: "Hello, I'm a snackbar",
     typeToLabel: {
       month: "Month",
       week: "Week",
       day: "Day",
       "4day": "4 Days"
     },
+    snackbar: false,
     start: null,
     end: null,
     selectedEvent: {},
@@ -247,8 +263,9 @@ export default {
   },
   methods: {
     createEvent() {
+      // this.selectedEvent.type="Abwesenheit"
+      // this.selectedEvent.abwesenheitsGrund = "Urlaub"
       this.selectedOpen = true;
-      
     },
     startCreating({ date, time }) {
       if (this.eventHovered) {
@@ -330,22 +347,65 @@ export default {
       this.selectedEventIndex = -1;
       this.selectedEvent = {};
       this.selectedElement = null;
-      
     },
-    validateAnwesenheit() {
-      if (this.selectedEvent.startTime && this.selectedEvent.endTime) {
+
+    checkOverlap() {},
+    validateEvent() {
+      if (
+        this.selectedEvent.type == "Abwesenheit" &&
+        !this.selectedEvent.abwesenheitsGrund
+      ) {
+        this.text = "Abwesenheits Grund nicht gesetzt";
+        this.snackbar = true;
         return true;
       }
-      return false;
-    },
-    updateEvent() {
-      let startTime;
-      let endTime;
+
+      if (!this.selectedEvent.type) {
+        this.text = "Erfassung nicht ausgewählt";
+        this.snackbar = true;
+        return true;
+      }
+      if (!this.selectedEvent.startDay || !this.selectedEvent.endDay) {
+        this.text = "Start Tag und End Tag müssen eingetragen sein";
+        this.snackbar = true;
+        return true;
+      }
+      if (
+        this.selectedEvent.type == "Anwesenheit" &&
+        (!this.selectedEvent.startTime || !this.selectedEvent.endTime)
+      ) {
+        this.text = "Zeiten dürfen nicht leer sein";
+        this.snackbar = true;
+        return true;
+      }
 
       if (
         this.selectedEvent.type == "Anwesenheit" &&
-        this.validateAnwesenheit()
-      ) {
+        this.selectedEvent.startTime
+      )
+        return false;
+    },
+
+    returnColor() {
+      let colorMap = {
+        Urlaub: "#a3dcff",
+        Krankheit: "#d2b2ff",
+        Feiertag: "#8fffa2"
+      };
+      console.log(colorMap[this.selectedEvent.abwesenheitsGrund])
+      let x = colorMap[this.selectedEvent.abwesenheitsGrund]
+      console.log((x == "undefined"))
+      return (x == undefined) ? "red" : x;
+    },
+    updateEvent() {
+      if (this.validateEvent()) {
+        return;
+      }
+
+      let startTime;
+      let endTime;
+
+      if (this.selectedEvent.type == "Anwesenheit") {
         startTime = [
           this.selectedEvent.startDay,
           this.selectedEvent.startTime
@@ -358,8 +418,12 @@ export default {
         endTime = this.selectedEvent.endDay;
       }
 
+      let neuerName =
+        this.selectedEvent.type == "Anweseheit"
+          ? "Arbeit"
+          : this.selectedEvent.abwesenheitsGrund;
       let updatedEvent = {
-        name: "Weekly Meeting",
+        name: neuerName,
         start: startTime,
         end: endTime,
         color: "red",
@@ -375,12 +439,17 @@ export default {
 };
 </script>
 
-<style  scoped>
+<style scoped >
 .floating_action_button {
   position: absolute;
   bottom: 0px;
   right: 28px;
   transform: translate(0px, -28px);
   z-index: 900;
+}
+/deep/ ::selection {
+  background-color: initial;
+  color: inherit;
+  text-shadow: initial;
 }
 </style>
