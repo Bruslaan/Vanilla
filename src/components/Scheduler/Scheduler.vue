@@ -33,10 +33,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(element,i) in data" :key="i">
+          <tr v-for="(element,i1) in data" :key="i1">
             <th class="name_header">
               <v-avatar class="mr-1" size="36">
-                <v-img :src="`https://i.pravatar.cc/10${i}`" alt="John">
+                <v-img :src="`https://i.pravatar.cc/10${i1}`" alt="John">
                   <template v-slot:placeholder>
                     <v-row class="fill-height ma-0" align="center" justify="center">
                       <v-progress-circular indeterminate color="grey lighten-2"></v-progress-circular>
@@ -46,7 +46,7 @@
               </v-avatar>
               {{element.name}}
             </th>
-            <td v-for="(n,i) in days" :key="i" :class="[ hasActiveEvents(element, n)]"></td>
+            <td v-for="(n,i2) in days" :key="i2" :class="[ hasActiveEvents(element, n)]"></td>
           </tr>
         </tbody>
       </template>

@@ -47,7 +47,7 @@
           </v-menu>
         </v-toolbar>
       </v-sheet>
-      <v-sheet height="600">
+      <v-sheet height="80vh">
         <v-calendar
           ref="calendar"
           v-model="focus"
@@ -63,6 +63,8 @@
           @mouseup:time="endCreating"
           @mouseenter:event="eventHovered=true"
           @mouseleave:event="eventHovered=false"
+          @mousedown:day="startAlldayEvent"
+          @mouseup:day="endAlldayEvent"
         ></v-calendar>
 
         <!-- EVENT MENU -->
@@ -110,7 +112,7 @@
               <v-col cols="10">
                 <v-list-item>
                   <v-icon>mdi-calendar</v-icon>
-                  <input class="pa-2" type="date" v-model="selectedEvent.startDay" />
+                  <input class="pa-2" type="date" v-model="selectedEvent.startDay">
                 </v-list-item>
                 <v-list-item v-if="selectedEvent.type =='Anwesenheit'">
                   <v-icon>mdi-clock</v-icon>
@@ -122,7 +124,7 @@
                     min="00:00"
                     max="23:59"
                     v-model="selectedEvent.startTime"
-                  />
+                  >
                 </v-list-item>
               </v-col>
             </v-row>
@@ -133,7 +135,7 @@
               <v-col cols="10">
                 <v-list-item>
                   <v-icon>mdi-calendar</v-icon>
-                  <input class="pa-2" type="date" v-model="selectedEvent.endDay" />
+                  <input class="pa-2" type="date" v-model="selectedEvent.endDay">
                 </v-list-item>
                 <v-list-item v-if="selectedEvent.type =='Anwesenheit'">
                   <v-icon>mdi-clock</v-icon>
@@ -145,7 +147,7 @@
                     min="00:00"
                     max="23:59"
                     v-model="selectedEvent.endTime"
-                  />
+                  >
                 </v-list-item>
               </v-col>
             </v-row>
@@ -194,24 +196,52 @@ export default {
     selectedEventIndex: -1,
     selectedElement: null,
     selectedOpen: false,
+    newAllDayEvent: {},
     renderEvent: false,
+    renderAllDayEvent: false,
     eventToRender: null,
     eventHovered: false,
     events: [
       {
-        name: "Weekly Meeting",
-        start: "2020-02-11",
+        name: "Urlaub",
+        start: "2020-02-10",
         end: "2020-02-12",
-        color: "primary",
-        type: "Abwesenheit"
+        color: "orange",
+        type: "Abwesenheit",
+        abwesenheitsGrund: "Urlaub"
       },
       {
-        name: "Weekly Meeting",
-        start: "2020-02-13 12:00",
-        end: "2020-02-13 13:00",
+        name: "Arbeit",
+        start: "2020-02-13 06:00",
+        end: "2020-02-13 12:00",
         color: "primary",
-        type: "Anwesenheit"
-      }
+        type: "Anwesenheit",
+        abwesenheitsGrund: "Arbeit"
+      },
+      {
+        name: "Arbeit",
+        start: "2020-02-14 07:00",
+        end: "2020-02-14 11:00",
+        color: "primary",
+        type: "Anwesenheit",
+        abwesenheitsGrund: "Arbeit"
+      },
+      {
+        name: "Krankheit",
+        start: "2020-02-15",
+        end: "2020-02-15",
+        color: "deep-purple",
+        type: "Abwesenheit",
+        abwesenheitsGrund: "Krankheit"
+      },
+      {
+        name: "Feiertag",
+        start: "2020-02-16",
+        end: "2020-02-16",
+        color: "green",
+        type: "Abwesenheit",
+        abwesenheitsGrund: "Feiertag"
+      },
     ],
     colors: [
       "blue",
@@ -259,6 +289,7 @@ export default {
     }
   },
   mounted() {
+    this.$refs.calendar.scrollToTime("06:00");
     this.$refs.calendar.checkChange();
   },
   methods: {
@@ -284,6 +315,27 @@ export default {
     endCreating() {
       // console.log("time", time);
       this.renderEvent = false;
+    },
+    startAlldayEvent(event) {
+      if (!this.eventHovered) {
+        this.renderAllDayEvent = true;
+          this.newAllDayEvent = {
+          name: "Urlaub",
+          start: event.date,
+          end: event.date,
+          type: "Abwesenheit",
+          color: "orange",
+          abwesenheitsGrund: "Urlaub"
+      };
+      }
+    },
+    endAlldayEvent(event) {
+      if (this.renderAllDayEvent) {
+        this.renderAllDayEvent = false;
+        this.newAllDayEvent["end"] = event.date;
+        this.events.push(this.newAllDayEvent);
+        this.newAllDayEvent = {};
+      }
     },
     // is triggered when new Calender week is renderd
     updateRange({ start, end }) {
@@ -353,8 +405,9 @@ export default {
     validateEvent() {
       if (
         this.selectedEvent.type == "Abwesenheit" &&
-        !this.selectedEvent.abwesenheitsGrund
+        !(this.abwesenheitsGrund.includes(this.selectedEvent.abwesenheitsGrund))
       ) {
+        console.log("reinindieolga")
         this.text = "Abwesenheits Grund nicht gesetzt";
         this.snackbar = true;
         return true;
@@ -378,7 +431,6 @@ export default {
         this.snackbar = true;
         return true;
       }
-
       if (
         this.selectedEvent.type == "Anwesenheit" &&
         this.selectedEvent.startTime
@@ -387,15 +439,16 @@ export default {
     },
 
     returnColor() {
+      if (this.selectedEvent.type == "Anwesenheit") {
+        return "primary";
+      }
       let colorMap = {
-        Urlaub: "#a3dcff",
-        Krankheit: "#d2b2ff",
-        Feiertag: "#8fffa2"
+        Urlaub: "orange",
+        Krankheit: "deep-purple",
+        Feiertag: "green"
       };
-      console.log(colorMap[this.selectedEvent.abwesenheitsGrund])
-      let x = colorMap[this.selectedEvent.abwesenheitsGrund]
-      console.log((x == "undefined"))
-      return (x == undefined) ? "red" : x;
+      let x = colorMap[this.selectedEvent.abwesenheitsGrund];
+      return x;
     },
     updateEvent() {
       if (this.validateEvent()) {
@@ -419,18 +472,21 @@ export default {
       }
 
       let neuerName =
-        this.selectedEvent.type == "Anweseheit"
+        this.selectedEvent.type == "Anwesenheit"
           ? "Arbeit"
           : this.selectedEvent.abwesenheitsGrund;
+
       let updatedEvent = {
         name: neuerName,
         start: startTime,
         end: endTime,
-        color: "red",
         type: this.selectedEvent.type,
-        abwesenheitsGrund: this.selectedEvent.abwesenheitsGrund
+        color: this.returnColor(),
+        abwesenheitsGrund: this.selectedEvent.abwesenheitsGrund || "Arbeit"
       };
-      this.events.splice(this.selectedEventIndex, 1);
+      if (this.selectedEventIndex != -1) {
+        this.events.splice(this.selectedEventIndex, 1);
+      }
       this.events.push(updatedEvent);
 
       this.clearAndCloseModal();
@@ -444,7 +500,7 @@ export default {
   position: absolute;
   bottom: 0px;
   right: 28px;
-  transform: translate(0px, -28px);
+  transform: translate(0px, -0px);
   z-index: 900;
 }
 /deep/ ::selection {
