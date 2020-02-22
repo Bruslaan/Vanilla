@@ -35,7 +35,7 @@
         <tbody>
           <tr v-for="(element,i1) in data" :key="i1">
             <th class="name_header">
-              <!-- <v-avatar class="mr-1" size="36">
+              <v-avatar class="mr-1" size="36">
                 <v-img :src="`https://i.pravatar.cc/10${i1}`" alt="John">
                   <template v-slot:placeholder>
                     <v-row class="fill-height ma-0" align="center" justify="center">
@@ -43,15 +43,14 @@
                     </v-row>
                   </template>
                 </v-img>
-              </v-avatar>-->
+              </v-avatar>
               {{element.name}}
             </th>
             <td
               v-for="(n,i2) in days"
               :key="i2"
-              
               :style="[ hasActiveEvents(element, n)]"
-              v-on:click="testfunction(element, i2)"
+              v-on:click="testfunction(element, n)"
             ></td>
           </tr>
         </tbody>
@@ -87,6 +86,7 @@ export default {
   data: () => ({
     selectedEvent: {},
     selectedIndex: -1,
+    selectedName: "",
     selectedOpen: false,
     currentDate: new Date(),
     lazyImage: require("@/assets/avatar-icon-png-9.jpg"),
@@ -102,15 +102,49 @@ export default {
     }
   },
   methods: {
-    testfunction(element, num) {
-      this.selectedOpen = true;
-      let clickedDay = num + 1;
-      // this.selectedEvent =
-      console.log("OBJEKT UND DESSEN ABWESENHEITEN", element);
-      console.log(clickedDay);
+    findWithAttr(array, attr, value) {
+      for (var i = 0; i < array.length; i += 1) {
+        if (array[i][attr] === value) {
+          return i;
+        }
+      }
+      return -1;
     },
-    acceptEvent() {},
+    testfunction(element, tag) {
+      let n = new Date(
+        this.currentDate.getFullYear(),
+        this.currentDate.getMonth(),
+        tag
+      );
+      n = Date.parse(n);
+      for (let index = 0; index < element.events.length; index++) {
+        if (element.events[index]["type"] == "Abwesenheit") {
+          let startTime = Date.parse(element.events[index]["start"] + " 00:00");
+          let endTime = Date.parse(element.events[index]["end"] + " 00:00");
+          if (n >= startTime && n <= endTime) {
+            this.selectedOpen = true;
+            this.selectedEvent = element.events[index];
+            this.selectedIndex = index;
+            this.selectedName = element.name;
+            // console.log(this.selectedEvent);
+          }
+        }
+      }
+    },
+    acceptEvent() {
+      this.selectedEvent.status = "bestätigt";
+      this.selectedEvent.color =
+        settings.eventColorMapping[this.selectedEvent["type"]][
+          this.selectedEvent.abwesenheitsGrund
+        ];
+      this.clearAndCloseModal();
+    },
     declinevent() {},
+    clearAndCloseModal() {
+      this.selectedOpen = false;
+      this.selectedEventIndex = -1;
+      this.selectedEvent = {};
+    },
     nextMonth() {
       //   this.currentDate = this.currentDate.setMonth(this.currentDate.getMonth() + 1);
       let oldDate = this.currentDate;
