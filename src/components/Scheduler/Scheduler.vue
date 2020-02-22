@@ -43,13 +43,13 @@
                     </v-row>
                   </template>
                 </v-img>
-              </v-avatar> -->
+              </v-avatar>-->
               {{element.name}}
             </th>
             <td
               v-for="(n,i2) in days"
               :key="i2"
-              :class="[ hasActiveEvents(element, n)]"
+              :style="[ hasActiveEvents(element, n)]"
               v-on:click="testfunction(element, i2)"
             ></td>
           </tr>
@@ -76,7 +76,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
   </div>
 </template>
 
@@ -99,17 +98,13 @@ export default {
   },
   methods: {
     testfunction(element, num) {
-      this.selectedOpen = true
+      this.selectedOpen = true;
       let clickedDay = num + 1;
       console.log("OBJEKT UND DESSEN ABWESENHEITEN", element);
       console.log(clickedDay);
     },
-    acceptEvent() {
-
-    },
-    declinevent() {
-
-    },
+    acceptEvent() {},
+    declinevent() {},
     nextMonth() {
       //   this.currentDate = this.currentDate.setMonth(this.currentDate.getMonth() + 1);
       let oldDate = this.currentDate;
@@ -152,23 +147,29 @@ export default {
         this.currentDate.getMonth(),
         tag
       );
-      n = Date.parse(n)
-      console.log(n)
+      console.log(n);
+      n = Date.parse(n);
+      console.log(n);
       // let found = false;
       for (let index = 0; index < element.events.length; index++) {
-        let startTime = Date.parse(element.events[index]["start"]);
-        let endTime = Date.parse(element.events[index]["end"]);
-        console.log(startTime, endTime)
-        if (n >= startTime && n <= endTime) {
-          // event found
-          let cssProperty = {};
-          let type = this.types[element.events[index]["type"]];
-          if (type) {
-            cssProperty[type] = true;
-          } else {
-            cssProperty["scheduler_active"] = true;
+        if (element.events[index]["type"] == "Abwesenheit") {
+          let startTime = Date.parse(element.events[index]["start"] + " 00:00");
+          let endTime = Date.parse(element.events[index]["end"] + " 00:00");
+          console.log(startTime, endTime);
+          if (n >= startTime && n <= endTime) {
+            // event found
+            let color = element.events[index]["color"];
+            let cssProperty = {};
+            // let type = this.types[element.events[index]["type"]];
+            if (color) {
+              cssProperty["background"] = color;
+              cssProperty["border-color"] = color;
+              // cssProperty[type] = true;
+            } else {
+              cssProperty["scheduler_active"] = true;
+            }
+            return cssProperty;
           }
-          return cssProperty;
         }
       }
       return {};

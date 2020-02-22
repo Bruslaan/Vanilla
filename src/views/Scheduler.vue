@@ -28,12 +28,44 @@ export default {
             // { start: "Thu Feb 12 2020", end: "Thu Feb 16 2020" },
             {
               name: "Urlaub",
-              start: "2020-02-18",
-              end: "2020-02-23",
-              color: "orange",
+              start: "2020-02-17",
+              end: "2020-02-19",
+              color: "#FF8112",
               type: "Abwesenheit",
               abwesenheitsGrund: "Urlaub"
-            }
+            },
+            {
+              name: "Feiertag",
+              start: "2020-02-23",
+              end: "2020-02-24",
+              color: "green",
+              type: "Abwesenheit",
+              abwesenheitsGrund: "Feiertag"
+            },
+            {
+              name: "Arbeit",
+              start: "2020-02-20 06:00",
+              end: "2020-02-20 12:00",
+              color: "primary",
+              type: "Anwesenheit",
+              abwesenheitsGrund: "Arbeit"
+            },
+            {
+              name: "Arbeit",
+              start: "2020-02-21 07:00",
+              end: "2020-02-21 11:00",
+              color: "primary",
+              type: "Anwesenheit",
+              abwesenheitsGrund: "Arbeit"
+            },
+            {
+              name: "Krankheit",
+              start: "2020-02-22",
+              end: "2020-02-22",
+              color: "#841884",
+              type: "Abwesenheit",
+              abwesenheitsGrund: "Krankheit"
+            },
           ]
         }
       ]
