@@ -205,41 +205,55 @@ export default {
       {
         name: "Urlaub",
         start: "2020-02-17",
-        end: "2020-02-19",
-        color: "orange",
+        end: "2020-02-18",
+        color: "#C5C5C5",
         type: "Abwesenheit",
+        status: "angefragt",
+        abwesenheitsGrund: "Urlaub"
+      },
+      {
+        name: "Urlaub",
+        start: "2020-02-19",
+        end: "2020-02-19",
+        color: "#FFB63D",
+        type: "Abwesenheit",
+        status: "bestätigt",
         abwesenheitsGrund: "Urlaub"
       },
       {
         name: "Arbeit",
         start: "2020-02-20 06:00",
         end: "2020-02-20 12:00",
-        color: "primary",
+        color: "#C5C5C5",
         type: "Anwesenheit",
+        status: "angefragt",
         abwesenheitsGrund: "Arbeit"
       },
       {
         name: "Arbeit",
         start: "2020-02-21 07:00",
         end: "2020-02-21 11:00",
-        color: "primary",
+        color: "#C5C5C5",
         type: "Anwesenheit",
+        status: "angefragt",
         abwesenheitsGrund: "Arbeit"
       },
       {
         name: "Krankheit",
         start: "2020-02-22",
         end: "2020-02-22",
-        color: "deep-purple",
+        color: "#C5C5C5",
         type: "Abwesenheit",
+        status: "angefragt",
         abwesenheitsGrund: "Krankheit"
       },
       {
         name: "Feiertag",
         start: "2020-02-23",
         end: "2020-02-23",
-        color: "green",
+        color: "#C5C5C5",
         type: "Abwesenheit",
+        status: "angefragt",
         abwesenheitsGrund: "Feiertag"
       }
     ],
@@ -296,6 +310,7 @@ export default {
     createEvent() {
       // this.selectedEvent.type="Abwesenheit"
       // this.selectedEvent.abwesenheitsGrund = "Urlaub"
+      this.selectedEvent.status = "angefragt"
       this.selectedOpen = true;
     },
     startCreating({ date, time }) {
@@ -306,7 +321,8 @@ export default {
         name: "New Event",
         start: [date, time].join(" "),
         end: [date, time].join(" "),
-        color: "primary",
+        color: "#C5C5C5",
+        status: "angefragt",
         type: "Anwesenheit"
       };
       this.events.push(newEvent);
@@ -324,7 +340,8 @@ export default {
           start: event.date,
           end: event.date,
           type: "Abwesenheit",
-          color: "orange",
+          color: "#C5C5C5",
+          status: "angefragt",
           abwesenheitsGrund: "Urlaub"
         };
       }
@@ -458,13 +475,16 @@ export default {
     },
 
     returnColor() {
+      if (this.selectedEvent.status == "angefragt") {
+        return "#C5C5C5";
+      }
       if (this.selectedEvent.type == "Anwesenheit") {
-        return "primary";
+        return "#4C95FF";
       }
       let colorMap = {
-        Urlaub: "orange",
-        Krankheit: "deep-purple",
-        Feiertag: "green"
+        Urlaub: "#FFB63D",
+        Krankheit: "#A43DFF",
+        Feiertag: "#52FF3D"
       };
       let x = colorMap[this.selectedEvent.abwesenheitsGrund];
       return x;
@@ -499,6 +519,7 @@ export default {
         name: neuerName,
         start: startTime,
         end: endTime,
+        status: "angefragt",
         type: this.selectedEvent.type,
         color: this.returnColor(),
         abwesenheitsGrund: this.selectedEvent.abwesenheitsGrund || "Arbeit"
