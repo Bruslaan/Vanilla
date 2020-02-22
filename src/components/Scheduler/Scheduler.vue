@@ -49,6 +49,7 @@
             <td
               v-for="(n,i2) in days"
               :key="i2"
+              
               :style="[ hasActiveEvents(element, n)]"
               v-on:click="testfunction(element, i2)"
             ></td>
@@ -80,8 +81,12 @@
 </template>
 
 <script>
+import settings from "@/settings";
+
 export default {
   data: () => ({
+    selectedEvent: {},
+    selectedIndex: -1,
     selectedOpen: false,
     currentDate: new Date(),
     lazyImage: require("@/assets/avatar-icon-png-9.jpg"),
@@ -100,6 +105,7 @@ export default {
     testfunction(element, num) {
       this.selectedOpen = true;
       let clickedDay = num + 1;
+      // this.selectedEvent =
       console.log("OBJEKT UND DESSEN ABWESENHEITEN", element);
       console.log(clickedDay);
     },
@@ -147,27 +153,45 @@ export default {
         this.currentDate.getMonth(),
         tag
       );
-      console.log(n);
+
       n = Date.parse(n);
-      console.log(n);
+
       // let found = false;
       for (let index = 0; index < element.events.length; index++) {
         if (element.events[index]["type"] == "Abwesenheit") {
           let startTime = Date.parse(element.events[index]["start"] + " 00:00");
           let endTime = Date.parse(element.events[index]["end"] + " 00:00");
-          console.log(startTime, endTime);
+
           if (n >= startTime && n <= endTime) {
             // event found
             let color = element.events[index]["color"];
             let cssProperty = {};
             // let type = this.types[element.events[index]["type"]];
-            if (color) {
+
+            let event = element.events[index];
+            if (event.status != "angefragt") {
               cssProperty["background"] = color;
               cssProperty["border-color"] = color;
-              // cssProperty[type] = true;
-            } else {
-              cssProperty["scheduler_active"] = true;
             }
+            if (event.status == "angefragt") {
+              let outlineColor = settings.eventColorMapping[event["type"]];
+              cssProperty["background"] =
+                "repeating-linear-gradient(45deg, #ffffff, #ffffff 6px, " +
+                outlineColor[event["abwesenheitsGrund"]] +
+                " 6px, " +
+                outlineColor[event["abwesenheitsGrund"]] +
+                " 12px)";
+            }
+            if (event.status == "storniert") {
+              let outlineColor = settings.eventColorMapping[event["type"]];
+              cssProperty["background"] =
+                "repeating-linear-gradient(45deg, red, red 5px, " +
+                outlineColor[event["abwesenheitsGrund"]] +
+                " 5px, " +
+                outlineColor[event["abwesenheitsGrund"]] +
+                " 10px)";
+            }
+
             return cssProperty;
           }
         }
