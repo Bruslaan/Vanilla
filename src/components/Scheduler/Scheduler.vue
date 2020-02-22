@@ -35,7 +35,7 @@
         <tbody>
           <tr v-for="(element,i1) in data" :key="i1">
             <th class="name_header">
-              <v-avatar class="mr-1" size="36">
+              <!-- <v-avatar class="mr-1" size="36">
                 <v-img :src="`https://i.pravatar.cc/10${i1}`" alt="John">
                   <template v-slot:placeholder>
                     <v-row class="fill-height ma-0" align="center" justify="center">
@@ -43,29 +43,54 @@
                     </v-row>
                   </template>
                 </v-img>
-              </v-avatar>
+              </v-avatar> -->
               {{element.name}}
             </th>
-            <td v-for="(n,i2) in days" :key="i2" :class="[ hasActiveEvents(element, n)]"></td>
+            <td
+              v-for="(n,i2) in days"
+              :key="i2"
+              :class="[ hasActiveEvents(element, n)]"
+              v-on:click="testfunction(element, i2)"
+            ></td>
           </tr>
         </tbody>
       </template>
     </v-simple-table>
+
+    <!-- EVENT MENU -->
+    <v-dialog v-model="selectedOpen" width="500">
+      <v-card color="grey lighten-4" flat>
+        <!-- EVENT TITLE TOOLBAR -->
+        <v-toolbar dark>
+          <v-toolbar-title>Bestätigung</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn text fab dark small @click="selectedOpen=false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+
+        <v-card-actions>
+          <v-btn text color="primary" @click="acceptEvent">Bestätigen</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn text color="primary" @click="declineEvent">Ablehnen</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
   </div>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      currentDate: new Date(),
-      lazyImage: require("@/assets/avatar-icon-png-9.jpg"),
-      types: {
-        Arbeit: "work",
-        else: "scheduler_active"
-      }
-    };
-  },
+  data: () => ({
+    selectedOpen: false,
+    currentDate: new Date(),
+    lazyImage: require("@/assets/avatar-icon-png-9.jpg"),
+    types: {
+      Arbeit: "work",
+      else: "scheduler_active"
+    }
+  }),
   props: {
     data: {
       type: Array,
@@ -73,6 +98,18 @@ export default {
     }
   },
   methods: {
+    testfunction(element, num) {
+      this.selectedOpen = true
+      let clickedDay = num + 1;
+      console.log("OBJEKT UND DESSEN ABWESENHEITEN", element);
+      console.log(clickedDay);
+    },
+    acceptEvent() {
+
+    },
+    declinevent() {
+
+    },
     nextMonth() {
       //   this.currentDate = this.currentDate.setMonth(this.currentDate.getMonth() + 1);
       let oldDate = this.currentDate;
@@ -109,15 +146,19 @@ export default {
     },
     hasActiveEvents(element, tag) {
       // tage zwischen element.start und element.end markieren
+      // console.log(element)
       let n = new Date(
         this.currentDate.getFullYear(),
         this.currentDate.getMonth(),
         tag
       );
+      n = Date.parse(n)
+      console.log(n)
       // let found = false;
       for (let index = 0; index < element.events.length; index++) {
         let startTime = Date.parse(element.events[index]["start"]);
         let endTime = Date.parse(element.events[index]["end"]);
+        console.log(startTime, endTime)
         if (n >= startTime && n <= endTime) {
           // event found
           let cssProperty = {};
@@ -150,7 +191,7 @@ export default {
       let days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
       return days;
     },
-    
+
     title() {
       let monthArray = [
         "Januar",
