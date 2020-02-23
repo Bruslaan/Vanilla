@@ -72,6 +72,15 @@ export default {
               abwesenheitsGrund: "Arbeit"
             },
             {
+              name: "Arbeit",
+              start: "2020-02-21 12:00",
+              end: "2020-02-21 15:30",
+              color: "#C5C5C5",
+              type: "Anwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Arbeit"
+            },
+            {
               name: "Krankheit",
               start: "2020-02-22",
               end: "2020-02-22",

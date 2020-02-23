@@ -51,28 +51,59 @@
               :key="i2"
               :style="[ hasActiveEvents(element, n)]"
               v-on:click="testfunction(element, n)"
-            ></td>
+            >{{getWorkingHours(element, n)}}</td>
           </tr>
         </tbody>
       </template>
     </v-simple-table>
 
     <!-- EVENT MENU -->
-    <v-dialog v-model="selectedOpen" width="500">
+    <v-dialog v-model="selectedOpen" width="450">
       <v-card color="grey lighten-4" flat>
         <!-- EVENT TITLE TOOLBAR -->
         <v-toolbar dark>
-          <v-toolbar-title>Bestätigung</v-toolbar-title>
+          <v-toolbar-title>{{selectedEventText[this.selectedEvent.status]}}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn text fab dark small @click="selectedOpen=false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-
+        <v-row>
+          <v-col cols="2" class="pb-0">
+            <v-list-item>Name:</v-list-item>
+          </v-col>
+          <v-col cols="8" class="pb-0">
+            <v-list-item>{{this.selectedName}}</v-list-item>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="2" class="pb-0">
+            <v-list-item>Grund:</v-list-item>
+          </v-col>
+          <v-col cols="8" class="pb-0">
+            <v-list-item>{{this.selectedEvent.abwesenheitsGrund}}</v-list-item>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="2" class="pb-0">
+            <v-list-item>Von:</v-list-item>
+          </v-col>
+          <v-col cols="8" class="pb-0">
+            <v-list-item>{{this.selectedEvent.start}}</v-list-item>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="2" class="pb-0">
+            <v-list-item>Bis:</v-list-item>
+          </v-col>
+          <v-col cols="8" class="pb-0">
+            <v-list-item>{{this.selectedEvent.end}}</v-list-item>
+          </v-col>
+        </v-row>
         <v-card-actions>
-          <v-btn text color="primary" @click="acceptEvent">Bestätigen</v-btn>
+          <v-btn text color="primary" @click="acceptEvent">Ja</v-btn>
           <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="declineEvent">Ablehnen</v-btn>
+          <v-btn text color="primary" @click="declineEvent">Nein</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -87,6 +118,11 @@ export default {
     selectedEvent: {},
     selectedIndex: -1,
     selectedName: "",
+    selectedEventText: {
+      angefragt: "Anfrage bestätigen?",
+      storniert: "Stornierung bestätigen?",
+      bestätigt: "Absage erteilen?"
+    },
     selectedOpen: false,
     currentDate: new Date(),
     lazyImage: require("@/assets/avatar-icon-png-9.jpg"),
@@ -126,27 +162,47 @@ export default {
             this.selectedEvent = element.events[index];
             this.selectedIndex = index;
             this.selectedName = element.name;
-            // console.log(this.selectedEvent);
           }
         }
       }
     },
     acceptEvent() {
-      this.selectedEvent.status = "bestätigt";
-      this.selectedEvent.color =
-        settings.eventColorMapping[this.selectedEvent["type"]][
-          this.selectedEvent.abwesenheitsGrund
-        ];
+      if (this.selectedEvent.status == "angefragt") {
+        this.selectedEvent.status = "bestätigt";
+        this.selectedEvent.color =
+          settings.eventColorMapping[this.selectedEvent["type"]][
+            this.selectedEvent.abwesenheitsGrund
+          ];
+      } else if (
+        this.selectedEvent.status == "storniert" ||
+        this.selectedEvent.status == "bestätigt"
+      ) {
+        this.data[this.findWithAttr(this.data, "name", this.selectedName)][
+          "events"
+        ].splice(this.selectedIndex, 1);
+      }
       this.clearAndCloseModal();
     },
-    declinevent() {},
+    declineEvent() {
+      if (this.selectedEvent.status == "angefragt") {
+        this.data[this.findWithAttr(this.data, "name", this.selectedName)][
+          "events"
+        ].splice(this.selectedIndex, 1);
+      } else if (this.selectedEvent.status == "storniert") {
+        this.selectedEvent.status = "bestätigt";
+        this.selectedEvent.color =
+          settings.eventColorMapping[this.selectedEvent["type"]][
+            this.selectedEvent.abwesenheitsGrund
+          ];
+      }
+      this.clearAndCloseModal();
+    },
     clearAndCloseModal() {
       this.selectedOpen = false;
       this.selectedEventIndex = -1;
       this.selectedEvent = {};
     },
     nextMonth() {
-      //   this.currentDate = this.currentDate.setMonth(this.currentDate.getMonth() + 1);
       let oldDate = this.currentDate;
 
       this.currentDate = new Date(
@@ -159,7 +215,6 @@ export default {
       this.currentDate = new Date();
     },
     prevMonth() {
-      //   this.currentDate = this.currentDate.setMonth(this.currentDate.getMonth() + 1);
       let oldDate = this.currentDate;
 
       this.currentDate = new Date(oldDate.getFullYear(), oldDate.getMonth(), 0);
@@ -173,7 +228,6 @@ export default {
         this.currentDate.getMonth(),
         day
       );
-      // console.log(today, n)
       if (today.getTime() === n.getTime()) {
         return true;
       }
@@ -181,16 +235,12 @@ export default {
     },
     hasActiveEvents(element, tag) {
       // tage zwischen element.start und element.end markieren
-      // console.log(element)
       let n = new Date(
         this.currentDate.getFullYear(),
         this.currentDate.getMonth(),
         tag
       );
-
       n = Date.parse(n);
-
-      // let found = false;
       for (let index = 0; index < element.events.length; index++) {
         if (element.events[index]["type"] == "Abwesenheit") {
           let startTime = Date.parse(element.events[index]["start"] + " 00:00");
@@ -200,7 +250,6 @@ export default {
             // event found
             let color = element.events[index]["color"];
             let cssProperty = {};
-            // let type = this.types[element.events[index]["type"]];
 
             let event = element.events[index];
             if (event.status != "angefragt") {
@@ -210,29 +259,68 @@ export default {
             if (event.status == "angefragt") {
               let outlineColor = settings.eventColorMapping[event["type"]];
               cssProperty["background"] =
-                "repeating-linear-gradient(45deg, #ffffff, #ffffff 6px, " +
+                "repeating-linear-gradient(45deg, #ffffff, #ffffff 3px, " +
                 outlineColor[event["abwesenheitsGrund"]] +
-                " 6px, " +
+                " 3px, " +
                 outlineColor[event["abwesenheitsGrund"]] +
-                " 12px)";
+                " 6px)";
             }
             if (event.status == "storniert") {
               let outlineColor = settings.eventColorMapping[event["type"]];
               cssProperty["background"] =
-                "repeating-linear-gradient(45deg, red, red 5px, " +
+                "repeating-linear-gradient(45deg, red, red 3px, " +
                 outlineColor[event["abwesenheitsGrund"]] +
-                " 5px, " +
+                " 3px, " +
                 outlineColor[event["abwesenheitsGrund"]] +
-                " 10px)";
+                " 6px)";
             }
-
             return cssProperty;
           }
         }
       }
       return {};
     },
-
+    getWorkingHours(element, tag) {
+      // tage zwischen element.start und element.end markieren
+      let tod = new Date(
+        this.currentDate.getFullYear(),
+        this.currentDate.getMonth(),
+        tag
+      );
+      tod = Date.parse(tod);
+      let workingHours = "";
+      for (let index = 0; index < element.events.length; index++) {
+        if (element.events[index]["type"] == "Anwesenheit") {
+          let startTime = Date.parse(
+            element.events[index]["start"].split(" ")[0] + " 00:00"
+          );
+          let endTime = Date.parse(
+            element.events[index]["end"].split(" ")[0] + " 00:00"
+          );
+          if (tod >= startTime && tod <= endTime) {
+            // event found
+            let startTimeDecimal =
+              Number(
+                element.events[index]["start"].split(" ")[1].split(":")[0]
+              ) +
+              Number(
+                element.events[index]["start"].split(" ")[1].split(":")[1] / 60
+              );
+            let endTimeDecimal =
+              Number(element.events[index]["end"].split(" ")[1].split(":")[0]) +
+              Number(
+                element.events[index]["end"].split(" ")[1].split(":")[1] / 60
+              );
+            if (workingHours == "") {
+              workingHours = endTimeDecimal - startTimeDecimal;
+            } else {
+              workingHours = workingHours + (endTimeDecimal - startTimeDecimal);
+            }
+          }
+        }
+      }
+      return workingHours;
+    },
     getDayOfWeek(day) {
       let date = new Date(
         this.currentDate.getFullYear(),
@@ -273,7 +361,6 @@ export default {
       );
     }
   }
-  //
 };
 </script>
 

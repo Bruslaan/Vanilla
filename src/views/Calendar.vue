@@ -17,7 +17,7 @@
     >
       <v-icon>mdi-plus</v-icon>
     </v-btn>
-    <v-col>
+    <v-col class="pa-0">
       <v-sheet height="64">
         <v-toolbar flat color="white">
           <v-btn fab text small color="grey darken-2" @click="prev">
@@ -70,102 +70,102 @@
         <!-- EVENT MENU -->
         <v-dialog v-model="selectedOpen" width="500">
           <v-card color="grey lighten-4" flat>
-              <!-- EVENT TITLE TOOLBAR -->
-              <v-toolbar dark>
-                <!-- <v-toolbar-title>{{ selectedEvent.name }}</v-toolbar-title> -->
-                <v-select
-                  v-model="selectedEvent.type"
-                  :items="types"
-                  dense
-                  outlined
-                  hide-details
-                  class="mr-5"
-                  label="Erfassung"
-                ></v-select>
-                <v-spacer></v-spacer>
-                <v-btn text fab dark small @click="clearAndCloseModal">
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-              </v-toolbar>
+            <!-- EVENT TITLE TOOLBAR -->
+            <v-toolbar dark>
+              <!-- <v-toolbar-title>{{ selectedEvent.name }}</v-toolbar-title> -->
+              <v-select
+                v-model="selectedEvent.type"
+                :items="types"
+                dense
+                outlined
+                hide-details
+                class="mr-5"
+                label="Erfassung"
+              ></v-select>
+              <v-spacer></v-spacer>
+              <v-btn text fab dark small @click="clearAndCloseModal">
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </v-toolbar>
 
-              <v-expand-transition>
-                <v-row v-if="selectedEvent.type=='Abwesenheit'">
-                  <v-col cols="6">
-                    <v-list-item>
-                      <v-select
-                        v-model="selectedEvent.abwesenheitsGrund"
-                        :items="abwesenheitsGrund"
-                        dense
-                        outlined
-                        hide-details
-                        class="mr-5"
-                        label="Grund"
-                      ></v-select>
-                    </v-list-item>
-                  </v-col>
-                </v-row>
-              </v-expand-transition>
-              <v-row>
-                <v-col cols="2">
-                  <v-list-item>Start:</v-list-item>
-                </v-col>
-                <v-col cols="10">
+            <v-expand-transition>
+              <v-row v-if="selectedEvent.type=='Abwesenheit'">
+                <v-col cols="6">
                   <v-list-item>
-                    <v-icon>mdi-calendar</v-icon>
-                    <input class="pa-2" type="date" v-model="selectedEvent.startDay">
-                  </v-list-item>
-                  <v-list-item v-if="selectedEvent.type =='Anwesenheit'">
-                    <v-icon>mdi-clock</v-icon>
-                    <input
-                      class="pa-2"
-                      type="time"
-                      id="appt"
-                      name="appt"
-                      min="00:00"
-                      max="23:59"
-                      v-model="selectedEvent.startTime"
-                    >
+                    <v-select
+                      v-model="selectedEvent.abwesenheitsGrund"
+                      :items="abwesenheitsGrund"
+                      dense
+                      outlined
+                      hide-details
+                      class="mr-5"
+                      label="Grund"
+                    ></v-select>
                   </v-list-item>
                 </v-col>
               </v-row>
-              <v-row>
-                <v-col cols="2">
-                  <v-list-item>Ende:</v-list-item>
-                </v-col>
-                <v-col cols="10">
-                  <v-list-item>
-                    <v-icon>mdi-calendar</v-icon>
-                    <input class="pa-2" type="date" v-model="selectedEvent.endDay">
-                  </v-list-item>
-                  <v-list-item v-if="selectedEvent.type =='Anwesenheit'">
-                    <v-icon>mdi-clock</v-icon>
-                    <input
-                      class="pa-2"
-                      type="time"
-                      id="appt"
-                      name="appt"
-                      min="00:00"
-                      max="23:59"
-                      v-model="selectedEvent.endTime"
-                    >
-                  </v-list-item>
-                </v-col>
-              </v-row>
-              <v-card-actions>
-                <v-btn text color="primary" @click="updateEvent">Speichern</v-btn>
-                <v-spacer></v-spacer>
-                <v-btn
-                  v-if="selectedEventIndex != -1"
-                  dark
-                  fab
-                  small
-                  class="mr-1"
-                  color="red"
-                  @click="deleteEvent"
-                >
-                  <v-icon>mdi-delete</v-icon>
-                </v-btn>
-              </v-card-actions>
+            </v-expand-transition>
+            <v-row>
+              <v-col cols="2">
+                <v-list-item>Start:</v-list-item>
+              </v-col>
+              <v-col cols="10">
+                <v-list-item>
+                  <v-icon>mdi-calendar</v-icon>
+                  <input class="pa-2" type="date" v-model="selectedEvent.startDay">
+                </v-list-item>
+                <v-list-item v-if="selectedEvent.type =='Anwesenheit'">
+                  <v-icon>mdi-clock</v-icon>
+                  <input
+                    class="pa-2"
+                    type="time"
+                    id="appt"
+                    name="appt"
+                    min="00:00"
+                    max="23:59"
+                    v-model="selectedEvent.startTime"
+                  >
+                </v-list-item>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="2">
+                <v-list-item>Ende:</v-list-item>
+              </v-col>
+              <v-col cols="10">
+                <v-list-item>
+                  <v-icon>mdi-calendar</v-icon>
+                  <input class="pa-2" type="date" v-model="selectedEvent.endDay">
+                </v-list-item>
+                <v-list-item v-if="selectedEvent.type =='Anwesenheit'">
+                  <v-icon>mdi-clock</v-icon>
+                  <input
+                    class="pa-2"
+                    type="time"
+                    id="appt"
+                    name="appt"
+                    min="00:00"
+                    max="23:59"
+                    v-model="selectedEvent.endTime"
+                  >
+                </v-list-item>
+              </v-col>
+            </v-row>
+            <v-card-actions>
+              <v-btn text color="primary" @click="updateEvent">Speichern</v-btn>
+              <v-spacer></v-spacer>
+              <v-btn
+                v-if="selectedEventIndex != -1"
+                dark
+                fab
+                small
+                class="mr-1"
+                color="red"
+                @click="deleteEvent"
+              >
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </v-card-actions>
           </v-card>
         </v-dialog>
       </v-sheet>
@@ -239,6 +239,15 @@ export default {
         abwesenheitsGrund: "Arbeit"
       },
       {
+        name: "Arbeit",
+        start: "2020-02-21 12:00",
+        end: "2020-02-21 15:30",
+        color: "#C5C5C5",
+        type: "Anwesenheit",
+        status: "angefragt",
+        abwesenheitsGrund: "Arbeit"
+      },
+      {
         name: "Krankheit",
         start: "2020-02-22",
         end: "2020-02-22",
@@ -303,14 +312,14 @@ export default {
     }
   },
   mounted() {
-    this.$refs.calendar.scrollToTime("06:00");
+    this.$refs.calendar.scrollToTime("05:30");
     this.$refs.calendar.checkChange();
   },
   methods: {
     createEvent() {
       // this.selectedEvent.type="Abwesenheit"
       // this.selectedEvent.abwesenheitsGrund = "Urlaub"
-      this.selectedEvent.status = "angefragt"
+      this.selectedEvent.status = "angefragt";
       this.selectedOpen = true;
     },
     startCreating({ date, time }) {
