@@ -339,7 +339,7 @@ export default {
           }
         }
       }
-      return workingHours;
+      return workingHours ?  Number(workingHours).toFixed(2) : workingHours;
     },
     getDayOfWeek(day) {
       let date = new Date(
@@ -437,7 +437,7 @@ table {
 td,
 th {
   border-right: 1px solid #ccc;
-  min-width: 50px;
+  /* min-width: 50px; */
   text-align: center !important;
 }
 

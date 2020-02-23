@@ -1,7 +1,7 @@
 <template>
   <div>
     <Scheduler :data="Mitarbeiter"/>
-    <v-btn text @click="addElement">Test</v-btn>
+    <!-- <v-btn text @click="addElement">Test</v-btn> -->
   </div>
 </template>
 
