@@ -14,6 +14,9 @@
         </v-btn>
         <h1>{{ title }}</h1>
         <v-spacer></v-spacer>
+        <v-col cols="3" class="pt-0 pb-2">
+          <v-text-field v-model="search" label="Suche" hide-details :onkeyup="searchFunction()"></v-text-field>
+        </v-col>
         <v-btn icon @click="heute">
           <v-icon>mdi-settings</v-icon>
         </v-btn>
@@ -32,11 +35,11 @@
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="myTable">
           <tr v-for="(element,i1) in data" :key="i1">
             <th class="name_header">
               <v-row align="center">
-                <v-col cols="10">
+                <v-col cols="9" class="pt-2 pb-2">
                   <v-avatar class="mr-1" size="36">
                     <v-img :src="`https://i.pravatar.cc/10${i1}`" alt="John">
                       <template v-slot:placeholder>
@@ -48,10 +51,12 @@
                   </v-avatar>
                   {{element.name}}
                 </v-col>
-                <v-col cols="2">
+                <v-col cols="3" class="pt-2 pb-2 ml-auto">
                   <v-checkbox
+                    class="ma-0"
                     v-model="element.monatBestätigt"
                     color="success"
+                    hide-details
                   ></v-checkbox>
                 </v-col>
               </v-row>
@@ -125,6 +130,7 @@ import settings from "@/settings";
 
 export default {
   data: () => ({
+    search: "",
     selectedEvent: {},
     selectedIndex: -1,
     selectedName: "",
@@ -157,21 +163,25 @@ export default {
       return -1;
     },
     testfunction(element, tag) {
-      let n = new Date(
-        this.currentDate.getFullYear(),
-        this.currentDate.getMonth(),
-        tag
-      );
-      n = Date.parse(n);
-      for (let index = 0; index < element.events.length; index++) {
-        if (element.events[index]["type"] == "Abwesenheit") {
-          let startTime = Date.parse(element.events[index]["start"] + " 00:00");
-          let endTime = Date.parse(element.events[index]["end"] + " 00:00");
-          if (n >= startTime && n <= endTime) {
-            this.selectedOpen = true;
-            this.selectedEvent = element.events[index];
-            this.selectedIndex = index;
-            this.selectedName = element.name;
+      if (element.monatBestätigt == false) {
+        let n = new Date(
+          this.currentDate.getFullYear(),
+          this.currentDate.getMonth(),
+          tag
+        );
+        n = Date.parse(n);
+        for (let index = 0; index < element.events.length; index++) {
+          if (element.events[index]["type"] == "Abwesenheit") {
+            let startTime = Date.parse(
+              element.events[index]["start"] + " 00:00"
+            );
+            let endTime = Date.parse(element.events[index]["end"] + " 00:00");
+            if (n >= startTime && n <= endTime) {
+              this.selectedOpen = true;
+              this.selectedEvent = element.events[index];
+              this.selectedIndex = index;
+              this.selectedName = element.name;
+            }
           }
         }
       }
@@ -340,6 +350,27 @@ export default {
       let weekIndex = date.getDay();
       let weekMap = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
       return weekMap[weekIndex];
+    },
+    searchFunction() {
+      // Declare variables
+      let filter, table, tr, td, i, txtValue;
+      filter = this.search.toUpperCase();
+      table = document.getElementById("myTable");
+      if (table) {
+        tr = table.getElementsByTagName("tr");
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("th")[0];
+          if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
+        }
+      }
     }
   },
   computed: {
