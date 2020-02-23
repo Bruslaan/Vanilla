@@ -35,16 +35,26 @@
         <tbody>
           <tr v-for="(element,i1) in data" :key="i1">
             <th class="name_header">
-              <v-avatar class="mr-1" size="36">
-                <v-img :src="`https://i.pravatar.cc/10${i1}`" alt="John">
-                  <template v-slot:placeholder>
-                    <v-row class="fill-height ma-0" align="center" justify="center">
-                      <v-progress-circular indeterminate color="grey lighten-2"></v-progress-circular>
-                    </v-row>
-                  </template>
-                </v-img>
-              </v-avatar>
-              {{element.name}}
+              <v-row align="center">
+                <v-col cols="10">
+                  <v-avatar class="mr-1" size="36">
+                    <v-img :src="`https://i.pravatar.cc/10${i1}`" alt="John">
+                      <template v-slot:placeholder>
+                        <v-row class="fill-height ma-0" align="center" justify="center">
+                          <v-progress-circular indeterminate color="grey lighten-2"></v-progress-circular>
+                        </v-row>
+                      </template>
+                    </v-img>
+                  </v-avatar>
+                  {{element.name}}
+                </v-col>
+                <v-col cols="2">
+                  <v-checkbox
+                    v-model="element.monatBestätigt"
+                    color="success"
+                  ></v-checkbox>
+                </v-col>
+              </v-row>
             </th>
             <td
               v-for="(n,i2) in days"

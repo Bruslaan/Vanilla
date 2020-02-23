@@ -24,6 +24,7 @@ export default {
       Mitarbeiter: [
         {
           name: "Test Peter Hans Jürgen",
+          monatBestätigt: true,
           events: [
             // { start: "Thu Feb 12 2020", end: "Thu Feb 16 2020" },
             {
