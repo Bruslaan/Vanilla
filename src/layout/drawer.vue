@@ -3,7 +3,7 @@
     <template v-slot:prepend>
       <v-list-item two-line>
         <v-list-item-avatar>
-          <img src="https://randomuser.me/api/portraits/women/81.jpg" />
+          <img :src="$store.getters['user/avatar']" />
         </v-list-item-avatar>
 
         <v-list-item-content>
@@ -16,7 +16,7 @@
     <v-divider></v-divider>
 
     <v-list dense>
-      <ListItem v-for="route in routes" :key="route.path" :item="route"  :base-path="route.path" />
+      <ListItem v-for="route in routes" :key="route.path" :item="route" :base-path="route.path" />
     </v-list>
   </v-navigation-drawer>
 </template>
