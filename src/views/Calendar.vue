@@ -427,7 +427,42 @@ export default {
       this.selectedElement = null;
     },
 
-    checkOverlap() {},
+    checkOverlap(event) {
+      let newStartTime;
+      let newEndTime;
+      if (event.type == "Anwesenheit") {
+        newStartTime = Date.parse(event.start);
+        newEndTime = Date.parse(event.end);
+      }
+      if (event.type == "Abwesenheit") {
+        newStartTime = Date.parse(event.start + " 00:00");
+        newEndTime = Date.parse(event.end + " 23:59");
+      }
+      for (let index = 0; index < this.events.length; index++) {
+        if (this.events[index]["type"] == "Anwesenheit") {
+          let startTime = Date.parse(this.events[index]["start"]);
+          let endTime = Date.parse(this.events[index]["end"]);
+          if (newStartTime <= startTime && newEndTime > startTime) {
+            return true;
+          }
+          if (newStartTime > startTime && newStartTime < endTime) {
+            return true;
+          }
+        }
+        if (this.events[index]["type"] == "Abwesenheit") {
+          let startTime = Date.parse(this.events[index]["start"] + " 00:00");
+          let endTime = Date.parse(this.events[index]["end"] + " 23:59");
+          console.log(newStartTime, newEndTime, startTime, endTime);
+          if (newStartTime <= startTime && newEndTime > startTime) {
+            return true;
+          }
+          if (newStartTime > startTime && newStartTime < endTime) {
+            return true;
+          }
+        }
+      }
+      return false;
+    },
     validateEvent() {
       if (
         this.selectedEvent.type == "Abwesenheit" &&
@@ -536,8 +571,12 @@ export default {
       if (this.selectedEventIndex != -1) {
         this.events.splice(this.selectedEventIndex, 1);
       }
+      if (this.checkOverlap(updatedEvent) == true) {
+        this.text = "Termine dürfen sich nicht überlappen";
+        this.snackbar = true;
+        return;
+      }
       this.events.push(updatedEvent);
-
       this.clearAndCloseModal();
     }
   }
