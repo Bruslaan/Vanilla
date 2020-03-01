@@ -57,6 +57,20 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/franzitable',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'FranziTable',
+        component: () => import('../views/FranziTable'),
+        meta: { title: 'FranziTable', icon: 'mdi-calendar-text' }
+      }
+    ]
+  },
+
+
 
   {
     path: '/profilePage',
@@ -69,8 +83,8 @@ const routes = [
         component: () => import('../views/ProfilePage'),
         meta: { title: 'ProfilePage', icon: 'mdi-calendar-text' }
       }
-    ]
-  },
+    ]ƒ
+    },
   // {
   //   path: '/anwesenheit',
   //   component: Layout,
