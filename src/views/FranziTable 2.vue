@@ -1,6 +1,6 @@
 <template>
   <div>
-    <TableComponent title="Fahrzeuge" :headers="headers" :data="data"/>
+    <TableComponent :headers="headers" :data="data"/>
     <!-- <TableComponent :data="Mitarbeiter"/> -->
   </div>
 </template>
@@ -17,12 +17,11 @@ export default {
   data() {
     return {
       headers: [
-        { name: "Kennzeichen", type: "text" },
-        { name: "Mitarbeiter", type: "text" },
+        { name: "Kennzeichen", type: "string" },
+        { name: "Mitarbeiter", type: "string" },
         { name: "Kilometerstand", type: "number" },
-        { name: "NächsterService", type: "date" },
-        { name: "Erstelltam", type: "text" },
-        { name: "Erstelltvon", type: "text" }
+        { name: "Erstelltam", type: "string" },
+        { name: "Erstelltvon", type: "string" }
       ],
       data: [
         {
@@ -30,7 +29,6 @@ export default {
           Kennzeichen: "M V 1337",
           Mitarbeiter: "Franzi",
           Kilometerstand: "100000",
-          NächsterService: "03.03.2020",
           Erstelltam: "01.03.2020 11:00",
           Erstelltvon: "Francesco"
         },
@@ -39,7 +37,6 @@ export default {
           Kennzeichen: "M V 1338",
           Mitarbeiter: "Brus",
           Kilometerstand: "0",
-          NächsterService: "03.04.2020",
           Erstelltam: "01.03.2020 11:00",
           Erstelltvon: "Francesco"
         },
@@ -48,23 +45,20 @@ export default {
           Kennzeichen: "M V 1339",
           Mitarbeiter: "Jansen",
           Kilometerstand: "123",
-          NächsterService: "02.05.2020",
           Erstelltam: "01.03.2020 11:00",
           Erstelltvon: "Francesco"
         }
       ],
-      protocol: {
-        "1234": [
-          {
-            Kennzeichen: "M V 1338",
-            Mitarbeiter: "Brusssssssssssss",
-            Kilometerstand: "0",
-            NächsterService: "03.03.2020",
-            Erstelltam: "01.03.2020 11:00",
-            Erstelltvon: "Francesco"
-          }
-        ]
-      }
+      protokoll: [
+        {
+          ref: "1234",
+          Kennzeichen: "M V 1338",
+          Mitarbeiter: "Brusssssssssssss",
+          Kilometerstand: "0",
+          Erstelltam: "01.03.2020 11:00",
+          Erstelltvon: "Francesco"
+        }
+      ]
     };
   }
 };
