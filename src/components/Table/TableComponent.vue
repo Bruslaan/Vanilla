@@ -32,8 +32,32 @@
               ></v-text-field>
             </v-col>
           </v-row>
-          <v-row justify="center">
-              <v-btn>ADD</v-btn>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- MODAL COLUMN -->
+    <v-dialog v-model="dialogColumn" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Column</span>
+          <v-spacer></v-spacer>
+          <v-btn text fab small @click="dialogColumn=false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col cols="12" sm="12" md="12" v-for="(header, index) in headers" :key="index">
+              <v-text-field
+                v-if="header.name!='Erstelltam' && header.name!='Erstelltvon'"
+                v-model="header.name"
+                :label="header.name"
+              ></v-text-field>
+            </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
@@ -60,7 +84,11 @@
         <thead>
           <tr>
             <th class="text-left" v-for="(head, index) in headers" :key="index">{{ head.name }}</th>
-            <th>Actions</th>
+            <th>
+              <v-btn @click="dialogColumn = true" text small color="grey darken-1">
+                <v-icon>mdi-table-column-plus-before</v-icon>
+              </v-btn>
+            </th>
           </tr>
         </thead>
         <tbody id="myTable">
@@ -101,6 +129,7 @@ export default {
     return {
       search: "",
       dialog: false,
+      dialogColumn: false,
       editedIndex: -1,
       editedItem: {}
     };
