@@ -69,6 +69,22 @@ const routes = [
       }
     ]
   },
+
+
+
+  {
+    path: '/profilePage',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'index',
+        name: 'ProfilePage',
+        component: () => import('../views/ProfilePage'),
+        meta: { title: 'ProfilePage', icon: 'mdi-calendar-text' }
+      }
+    ]ƒ
+    },
   // {
   //   path: '/anwesenheit',
   //   component: Layout,
