@@ -5,7 +5,7 @@
       {{ text }}
       <v-btn color="white" text @click="snackbar = false">Close</v-btn>
     </v-snackbar>
-    <!-- SnackBar -->
+    <!-- Floating Button -->
     <v-btn
       class="floating_action_button mb-12"
       @click="createEvent"
