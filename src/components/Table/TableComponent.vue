@@ -84,7 +84,7 @@
         <thead>
           <tr>
             <th class="text-left" v-for="(head, index) in headers" :key="index">{{ head.name }}</th>
-            <th>
+            <th style="width: 40px">
               <v-btn @click="dialogColumn = true" text small color="grey darken-1">
                 <v-icon>mdi-table-column-plus-before</v-icon>
               </v-btn>
@@ -98,7 +98,7 @@
               :key="index_column"
               :type="header.type"
             >{{ item[header.name] }}</td>
-            <td>
+            <td style="text-align: center">
               <v-icon small class="mr-2" @click="editItem(item, index)">mdi-pencil</v-icon>
               <v-icon small @click="deleteItem(item, index)">mdi-delete</v-icon>
             </td>
