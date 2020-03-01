@@ -83,8 +83,8 @@ const routes = [
         component: () => import('../views/ProfilePage'),
         meta: { title: 'ProfilePage', icon: 'mdi-calendar-text' }
       }
-    ]ƒ
-    },
+    ]
+  },
   // {
   //   path: '/anwesenheit',
   //   component: Layout,
