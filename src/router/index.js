@@ -78,7 +78,7 @@ const routes = [
     hidden: true,
     children: [
       {
-        path: 'index',
+        path: 'index/:userId',
         name: 'ProfilePage',
         component: () => import('../views/ProfilePage'),
         meta: { title: 'ProfilePage', icon: 'mdi-calendar-text' }
