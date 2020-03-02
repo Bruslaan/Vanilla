@@ -124,7 +124,7 @@
     <!-- TABLE TOOLBAR -->
     <v-toolbar flat color="white">
       <v-toolbar-title>{{ title }}</v-toolbar-title>
-      <v-btn text class="mx-2" @click="filterRow=true">
+      <v-btn text class="mx-2" @click="switchFilterRow()">
         <v-icon>mdi-filter-menu</v-icon>
       </v-btn>
       <v-text-field
@@ -137,16 +137,28 @@
     </v-toolbar>
     <!-- FILTER -->
     <v-expand-transition>
-      <v-row v-if="filterRow==true">
-        <v-col cols="1">
-          <v-btn @click="dialogFilter=true" text color="grey darken-1">
-            <v-icon>mdi-filter-plus</v-icon>
-          </v-btn>
-        </v-col>
-      </v-row>
+      <v-card v-if="filterRow==true">
+        <v-row class="ma-0 py-1 px-0">
+          <v-col cols="1">
+            <v-btn @click="dialogFilter=true" text color="grey darken-1">
+              <v-icon>mdi-filter-plus</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="7">
+            <v-chip-group>
+              <v-chip
+                v-for="(item, index) in filters_arguments"
+                :key="index"
+                close
+                @click:close="filterDelete(index)"
+              >{{item.column + " " + item.Operator + " " + item.value + " " + item.value2}}</v-chip>
+            </v-chip-group>
+          </v-col>
+        </v-row>
+      </v-card>
     </v-expand-transition>
     <!-- TABLE CONTENT -->
-    <v-simple-table fixed-header height="80vh">
+    <v-simple-table fixed-header class="pt-1" height="80vh">
       <template v-slot:default>
         <thead>
           <tr>
@@ -206,6 +218,7 @@ export default {
       filterRow: false,
       filterHeader: "",
       filterOperator: "",
+      filters_arguments: [],
       filters: [
         "gleich",
         "nicht gleich",
@@ -229,6 +242,13 @@ export default {
     }
   },
   methods: {
+    switchFilterRow() {
+      if (this.filterRow == true) {
+        this.filterRow = false;
+      } else {
+        this.filterRow = true;
+      }
+    },
     getHeadernames() {
       let items = [];
       let item;
@@ -514,24 +534,14 @@ export default {
       }
     },
     filterTable(filterHeader, ope, val, val2) {
-      // Declare variables
       let td;
       let table = document.getElementById("myTable");
       let tr = [];
       table.getElementsByTagName("tr").forEach(function(el) {
         tr.push(el);
       });
-      // let j = 0;
       let th_index = this.getHeadernames().indexOf(filterHeader);
-      console.log(th_index);
       let th_type = this.headers[th_index].type;
-      // table.getElementsByTagName("th").forEach(function(el) {
-      //   if (el.innerText == col) {
-      //     th_index = j;
-      //     th_type = el.getAttribute("type");
-      //   }
-      //   j = j + 1;
-      // });
       // Loop through all table rows, and hide those who don't match the search query
       for (let i = 0; i < tr.length; i++) {
         let check = false;
@@ -563,7 +573,6 @@ export default {
             value2 = String(val2);
             content = String(td.innerHTML);
           }
-
           if (ope == "gleich") {
             if (content == value) {
               check = true;
@@ -605,12 +614,54 @@ export default {
         if (check) {
           // console.log(test)
         } else {
-          tr[i].style.display = "none";
+          // tr[i].style.display = "none";
           tr[i].classList.add("nodisplay");
         }
       }
-      // this.dialogFilter = false;
-    }
+      this.filters_arguments.push({
+        column: filterHeader,
+        Operator: ope,
+        value: val,
+        value2: val2
+      });
+      this.dialogFilter = false;
+    },
+    clearAllFilters() {
+      let table = document.getElementById("myTable");
+      let tr = [];
+      table.getElementsByTagName("tr").forEach(function(el) {
+        tr.push(el);
+      });
+      for (let i = 0; i < tr.length; i++) {
+        tr[i].style.display = "";
+        if (tr[i].classList.contains("nodisplay")) {
+          tr[i].classList.remove("nodisplay");
+        }
+        // if (tr[i].getElementsByTagName("button").length != 0) {
+        //   let button_id = tr[i].getElementsByTagName("button")[0].id;
+        //   var protokoll_elemets = table.getElementsByClassName(button_id);
+        //   for (let j = 0; j < protokoll_elemets.length; j++) {
+        //     protokoll_elemets[j].style.display = "";
+        //     if (protokoll_elemets[j].classList.contains("nodisplay")) {
+        //       protokoll_elemets[j].classList.remove("nodisplay");
+        //     }
+        //   }
+        // }
+      }
+    },
+    apply_filters_arguments() {
+      this.clearAllFilters();
+      for (let i = 0; i < this.filters_arguments.length; i++) {
+        let accept_col = this.filters_arguments[i]["column"];
+        let accept_ope = this.filters_arguments[i]["Operator"];
+        let accept_val = this.filters_arguments[i]["value"];
+        let accept_val2 = this.filters_arguments[i]["value2"];
+        this.filterTable(accept_col, accept_ope, accept_val, accept_val2);
+      }
+    },
+    filterDelete(index) {
+      this.filters_arguments.splice(index, 1);
+    },
     // findWithAttr(array, attr, value) {
     //   for (var i = 0; i < array.length; i += 1) {
     //     if (array[i][attr] === value) {
@@ -624,6 +675,9 @@ export default {
 </script>
 
 <style scoped>
+.nodisplay {
+  display: none;
+}
 .floating_action_button {
   position: absolute;
   bottom: 0px;
