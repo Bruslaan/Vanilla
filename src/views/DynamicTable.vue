@@ -22,10 +22,15 @@
             </v-avatar>
             <!-- <a @click="$router.push('/profilePage')" class="ml-2">{{item.name}}</a> -->
             <router-link
+              style="text-decoration: none;"
               :to="{ name: 'ProfilePage', params: { userId: '1231mdlksjdaklje' }}"
             >{{item.name}}</router-link>
           </v-col>
         </v-row>
+      </template>
+
+      <template v-slot:item.login="{ item }">
+        <v-checkbox readonly v-model="item.login"></v-checkbox>
       </template>
 
       <template v-slot:top>
@@ -61,10 +66,15 @@
                       :key="index"
                     >
                       <v-text-field
-                        v-if="header.value!='action'"
+                        v-if="header.value!='action' && header.value!='login'"
                         v-model="editedItem[header.value]"
                         :label="header.text"
                       ></v-text-field>
+                      <v-checkbox
+                        v-if="header.value=='login'"
+                        v-model="editedItem[header.value]"
+                        label="Login Aktivieren"
+                      ></v-checkbox>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -103,6 +113,10 @@ export default {
       },
       { text: "Email", value: "email" },
       { text: "Passwort", value: "password" },
+      {
+        text: "Login Aktiv",
+        value: "login"
+      },
       { text: "Actions", value: "action", sortable: false }
     ],
     users: [],
@@ -138,7 +152,8 @@ export default {
           name: users[user]["name"],
           email: "blabl",
           password: "kaka",
-          avatar: users[user]["avatar"]
+          avatar: users[user]["avatar"],
+          login: false
         });
       }
 
