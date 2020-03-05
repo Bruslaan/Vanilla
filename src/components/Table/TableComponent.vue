@@ -70,14 +70,14 @@
     <v-dialog v-model="dialogFilter" max-width="500px">
       <v-card>
         <v-card-title>
-          <span class="headline">Filter</span>
+          <span class="headline">Neuer Filter</span>
           <v-spacer></v-spacer>
           <v-btn text fab small @click="dialogFilter=false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
         <v-card-text>
-          <v-row>
+          <v-row class="pa-2">
             <v-select
               v-model="filterHeader"
               :items="getHeadernames()"
@@ -85,10 +85,10 @@
               outlined
               hide-details
               class
-              label="Filter"
+              label="Spalte"
             ></v-select>
           </v-row>
-          <v-row>
+          <v-row class="pa-2">
             <v-select
               v-model="filterOperator"
               :items="filters"
@@ -99,13 +99,14 @@
               label="Filter"
             ></v-select>
           </v-row>
-          <v-row>
-            <v-text-field label="Wert" v-model="val1"></v-text-field>
+          <v-row class="px-3">
+            <v-text-field hide-details label="Wert" v-model="val1"></v-text-field>
           </v-row>
-          <v-row>
+          <v-row class="px-3">
             <v-text-field
               label="Zweiter Wert"
               v-model="val2"
+              hide-details
               v-if="filterOperator=='zwischen' || filterOperator=='zwischen inbegriffen' || filterOperator=='nicht zwischen'"
             ></v-text-field>
           </v-row>
@@ -115,7 +116,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="filterTable(filterHeader, filterOperator, val1, val2)"
+            @click="addFilter(filterHeader, filterOperator, val1, val2)"
           >Filter</v-btn>
         </v-card-actions>
       </v-card>
@@ -137,19 +138,20 @@
     </v-toolbar>
     <!-- FILTER -->
     <v-expand-transition>
-      <v-card v-if="filterRow==true">
-        <v-row class="ma-0 py-1 px-0">
+      <v-card outlined v-if="filterRow==true">
+        <v-row class="ma-0 py-0 px-0">
           <v-col cols="1">
-            <v-btn @click="dialogFilter=true" text color="grey darken-1">
+            <v-btn @click="dialogFilter=true" class="py-2" text color="grey darken-1">
               <v-icon>mdi-filter-plus</v-icon>
             </v-btn>
           </v-col>
-          <v-col cols="7">
+          <v-col cols="11">
             <v-chip-group>
               <v-chip
                 v-for="(item, index) in filters_arguments"
                 :key="index"
                 close
+                small
                 @click:close="filterDelete(index)"
               >{{item.column + " " + item.Operator + " " + item.value + " " + item.value2}}</v-chip>
             </v-chip-group>
@@ -618,12 +620,19 @@ export default {
           tr[i].classList.add("nodisplay");
         }
       }
+    },
+    addFilter(filterHeader, ope, val, val2) {
       this.filters_arguments.push({
         column: filterHeader,
         Operator: ope,
         value: val,
         value2: val2
       });
+      this.filterHeader = ''
+      this.filterOperator = ''
+      this.val1 = ''
+      this.val2 = ''
+      this.apply_filters_arguments();
       this.dialogFilter = false;
     },
     clearAllFilters() {
@@ -651,6 +660,7 @@ export default {
     },
     apply_filters_arguments() {
       this.clearAllFilters();
+      // console.log(this.filters_arguments.length);
       for (let i = 0; i < this.filters_arguments.length; i++) {
         let accept_col = this.filters_arguments[i]["column"];
         let accept_ope = this.filters_arguments[i]["Operator"];
@@ -661,7 +671,8 @@ export default {
     },
     filterDelete(index) {
       this.filters_arguments.splice(index, 1);
-    },
+      this.apply_filters_arguments();
+    }
     // findWithAttr(array, attr, value) {
     //   for (var i = 0; i < array.length; i += 1) {
     //     if (array[i][attr] === value) {
