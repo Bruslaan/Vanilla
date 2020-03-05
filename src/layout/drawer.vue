@@ -7,7 +7,11 @@
         </v-list-item-avatar>
 
         <v-list-item-content>
-          <v-list-item-title>{{$store.getters["user/name"]}}</v-list-item-title>
+          <!-- <v-list-item-title>{{$store.getters["user/name"]}}</v-list-item-title> -->
+          <router-link
+            style="text-decoration: none;"
+            :to="{ name: 'ProfilePage', params: { userId: '1231mdlksjdaklje' }}"
+          >{{$store.getters["user/name"]}}</router-link>
           <v-list-item-subtitle>Status oder So</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>

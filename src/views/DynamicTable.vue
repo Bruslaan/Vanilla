@@ -30,7 +30,7 @@
       </template>
 
       <template v-slot:item.login="{ item }">
-        <v-checkbox readonly v-model="item.login"></v-checkbox>
+        <v-checkbox readonly disabled v-model="item.login"></v-checkbox>
       </template>
 
       <template v-slot:top>

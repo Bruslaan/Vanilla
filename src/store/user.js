@@ -6,7 +6,12 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    user:{
+      name: '',
+      avatar: '',
+      uid: '',
+    }
   }
 }
 
