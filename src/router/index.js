@@ -57,6 +57,19 @@ const routes = [
       }
     ]
   },
+
+  {
+    path: '/stammdaten',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Stammdaten',
+        component: () => import('../views/Stammdaten'),
+        meta: { title: 'Stammdaten', icon: 'mdi-calendar-text' }
+      }
+    ]
+  },
   {
     path: '/franzitable',
     component: Layout,

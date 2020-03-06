@@ -10,7 +10,7 @@ export default {
         Vorname: "Josef",
         Nachname: "Meier",
         Wohnort: "Maraschki Straße 12",
-        SteuerID: "11111"
+        SteuerID: 12
       },
       AndereInformationen: {
         Bank: "Mascha Kascha",
@@ -50,7 +50,7 @@ export default {
       </v-tabs>
 
       <v-tabs-items v-model="tab">
-        <v-tab-item v-for="item in items" :key="item">
+        <v-tab-item >
           <v-card color="basil" flat>
             <v-layout wrap class="pa-3 mt-5">
               <v-row>
@@ -59,6 +59,11 @@ export default {
                 <Informationen :data="AndereInformationen" text="Bank Daten" />
               </v-row>
             </v-layout>
+          </v-card>
+        </v-tab-item>
+        <v-tab-item >
+          <v-card color="basil" flat>
+            <v-layout wrap class="pa-3 mt-5">nix hier</v-layout>
           </v-card>
         </v-tab-item>
       </v-tabs-items>
