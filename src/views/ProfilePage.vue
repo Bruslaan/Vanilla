@@ -5,7 +5,19 @@ export default {
   data() {
     return {
       tab: null,
-      items: ["Information", "Anwesenheit", "Abwesenheit", "Rollen"]
+      items: ["Information", "Anwesenheit", "Abwesenheit", "Rollen"],
+      PersonalInformation: {
+        Vorname: "Josef",
+        Nachname: "Meier",
+        Wohnort: "Maraschki Straße 12",
+        SteuerID: "11111"
+      },
+      AndereInformationen: {
+        Bank: "Mascha Kascha",
+        "Name des Kontoinhabers": "Meier",
+        IBAN: "as123asdRoll",
+        BIC: "22222"
+      }
     };
   }
 };
@@ -40,7 +52,13 @@ export default {
       <v-tabs-items v-model="tab">
         <v-tab-item v-for="item in items" :key="item">
           <v-card color="basil" flat>
-            <Informationen />
+            <v-layout wrap class="pa-3 mt-5">
+              <v-row>
+                <Informationen :data="PersonalInformation" text="Personal Information" />
+                <Informationen :data="AndereInformationen" text="Andere Information" />
+                <Informationen :data="AndereInformationen" text="Bank Daten" />
+              </v-row>
+            </v-layout>
           </v-card>
         </v-tab-item>
       </v-tabs-items>
