@@ -21,6 +21,7 @@ export default {
         { name: "Mitarbeiter", type: "text" },
         { name: "Kilometerstand", type: "number" },
         { name: "NächsterService", type: "date" },
+        { name: "Funktionsfähig", type: "bool" },
         { name: "Erstelltam", type: "text" },
         { name: "Erstelltvon", type: "text" }
       ],
@@ -31,6 +32,7 @@ export default {
           Mitarbeiter: "Franzi",
           Kilometerstand: "100000",
           NächsterService: "03.03.2020",
+          Funktionsfähig: "true",
           Erstelltam: "01.03.2020 11:00",
           Erstelltvon: "Francesco"
         },
@@ -40,6 +42,7 @@ export default {
           Mitarbeiter: "Brus",
           Kilometerstand: "0",
           NächsterService: "03.04.2020",
+          Funktionsfähig: "false",
           Erstelltam: "01.03.2020 11:00",
           Erstelltvon: "Francesco"
         },
@@ -49,6 +52,7 @@ export default {
           Mitarbeiter: "Jansen",
           Kilometerstand: "123",
           NächsterService: "02.05.2020",
+          Funktionsfähig: "true",
           Erstelltam: "01.03.2020 11:00",
           Erstelltvon: "Francesco"
         }

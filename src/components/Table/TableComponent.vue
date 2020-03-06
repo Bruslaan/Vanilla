@@ -179,11 +179,12 @@
         </thead>
         <tbody id="myTable">
           <tr v-for="(item, index) in data" :key="index">
-            <td
-              v-for="(header, index_column) in headers"
-              :key="index_column"
-              :type="header.type"
-            >{{ item[header.name] }}</td>
+              <component
+                v-for="(header, index_column) in headers"
+                :key="index_column"
+                :is="component_mapping[String(header.type)]"
+                v-bind:name="item[header.name]"
+              ></component>
             <td style="text-align: center">
               <v-icon small class="mr-2" @click="editItem(item, index)">mdi-pencil</v-icon>
               <v-icon small @click="deleteItem(item, index)">mdi-delete</v-icon>
@@ -196,6 +197,8 @@
 </template>
 
 <script>
+import TableText from "./table_text";
+import TableCheckbox from "./table_checkbox";
 export default {
   props: {
     data: {
@@ -210,6 +213,10 @@ export default {
       type: String,
       required: true
     }
+  },
+  components: {
+    TableText,
+    TableCheckbox
   },
   data() {
     return {
@@ -234,6 +241,12 @@ export default {
       ],
       val1: "",
       val2: "",
+      component_mapping: {
+        text: "TableText",
+        number: "TableText",
+        date: "TableText",
+        bool: "TableCheckbox"
+      },
       editedIndex: -1,
       editedItem: {}
     };
@@ -628,10 +641,10 @@ export default {
         value: val,
         value2: val2
       });
-      this.filterHeader = ''
-      this.filterOperator = ''
-      this.val1 = ''
-      this.val2 = ''
+      this.filterHeader = "";
+      this.filterOperator = "";
+      this.val1 = "";
+      this.val2 = "";
       this.apply_filters_arguments();
       this.dialogFilter = false;
     },
