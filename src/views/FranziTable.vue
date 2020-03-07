@@ -1,6 +1,6 @@
 <template>
   <div>
-    <TableComponent title="Fahrzeuge" :headers="headers" :data="data"/>
+    <TableComponent title="Fahrzeuge" :headers="headers" :data="data" :protocol="protocol"/>
     <!-- <TableComponent :data="Mitarbeiter"/> -->
   </div>
 </template>
@@ -40,7 +40,7 @@ export default {
           uid: "1234",
           Kennzeichen: "M V 1338",
           Mitarbeiter: "Brus",
-          Kilometerstand: "0",
+          Kilometerstand: "500",
           NächsterService: "03.04.2020",
           Funktionsfähig: "false",
           Erstelltam: "01.03.2020 11:00",
@@ -60,10 +60,22 @@ export default {
       protocol: {
         "1234": [
           {
+            ref: "1234",
             Kennzeichen: "M V 1338",
-            Mitarbeiter: "Brusssssssssssss",
+            Mitarbeiter: "Brusssssss",
+            Kilometerstand: "300",
+            NächsterService: "03.03.2020",
+            Funktionsfähig: "true",
+            Erstelltam: "01.03.2020 11:00",
+            Erstelltvon: "Francesco"
+          },
+          {
+            ref: "1234",
+            Kennzeichen: "M V 1338",
+            Mitarbeiter: "Brusssssss",
             Kilometerstand: "0",
             NächsterService: "03.03.2020",
+            Funktionsfähig: "true",
             Erstelltam: "01.03.2020 11:00",
             Erstelltvon: "Francesco"
           }

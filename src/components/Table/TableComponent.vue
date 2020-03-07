@@ -178,17 +178,39 @@
           </tr>
         </thead>
         <tbody id="myTable">
-          <tr v-for="(item, index) in data" :key="index">
-              <component
-                v-for="(header, index_column) in headers"
-                :key="index_column"
-                :is="component_mapping[String(header.type)]"
-                v-bind:name="item[header.name]"
-              ></component>
+          <tr v-for="(item, index) in data" :key="index" :id="item.uid" class="TR">
+            <!-- <component
+              v-for="(header, index_column) in headers"
+              :key="index_column"
+              :is="component_mapping[String(header.type)]"
+              v-bind:name="item[header.name]"
+            ></component>-->
+            <Cell
+              v-for="(header, index_column) in headers"
+              :key="index_column"
+              :component="header.type"
+              v-bind:name="item[header.name]"
+            ></Cell>
             <td style="text-align: center">
               <v-icon small class="mr-2" @click="editItem(item, index)">mdi-pencil</v-icon>
+              <v-icon small class="mr-2" @click="toggleProtocol(item)">mdi-script</v-icon>
               <v-icon small @click="deleteItem(item, index)">mdi-delete</v-icon>
             </td>
+          </tr>
+          <tr
+            v-for="(protocol_item, protocol_index) in activeprotocol"
+            :key="protocol_index"
+            :id="protocol_item.ref"
+            class="protocolTR"
+          >
+            <Cell
+              v-for="(header, protocol_index_column) in headers"
+              :key="protocol_index_column"
+              class="protocolTD"
+              :component="header.type"
+              v-bind:name="protocol_item[header.name]"
+            ></Cell>
+            <td class="protocolTD"></td>
           </tr>
         </tbody>
       </template>
@@ -197,11 +219,18 @@
 </template>
 
 <script>
-import TableText from "./table_text";
-import TableCheckbox from "./table_checkbox";
+// import TableText from "./table_text";
+// import TableCheckbox from "./table_checkbox";
+import Cell from "./Cell";
+import { setTimeout } from "timers";
+// import { createDOM } from '../utils/utils';
 export default {
   props: {
     data: {
+      type: Array,
+      required: true
+    },
+    protocol: {
       type: Array,
       required: true
     },
@@ -215,11 +244,13 @@ export default {
     }
   },
   components: {
-    TableText,
-    TableCheckbox
+    // TableText,
+    // TableCheckbox,
+    Cell
   },
   data() {
     return {
+      table123: [],
       search: "",
       dialog: false,
       dialogColumn: false,
@@ -241,14 +272,16 @@ export default {
       ],
       val1: "",
       val2: "",
-      component_mapping: {
-        text: "TableText",
-        number: "TableText",
-        date: "TableText",
-        bool: "TableCheckbox"
-      },
+      // component_mapping: {
+      //   text: "TableText",
+      //   number: "TableText",
+      //   date: "TableText",
+      //   bool: "TableCheckbox"
+      // },
       editedIndex: -1,
-      editedItem: {}
+      editedItem: {},
+      activeprotocol: [],
+      activeprotocolids: {}
     };
   },
   computed: {
@@ -257,6 +290,67 @@ export default {
     }
   },
   methods: {
+    toggleProtocol(item) {
+    //   if (item.uid in this.activeprotocolids) {
+    //     //lalal
+    //   } else {
+    //     this.activeprotocolids[item.uid] = [];
+    //     for (let row of this.protocol[item.uid]) {
+    //       let td_list = [];
+    //       for (let header of this.headers) {
+    //           let td = createElement(Cell, {
+    //             props: {
+    //               key: j,
+    //               component: row[header.type],
+    //               name: row[header.name]
+    //             }
+    //           });
+    //           td_list.push(td)
+    //       }
+    //       let tr = createDOM("tr", [{"class": "protocolTR"}], "", td_list);
+    //       item.parentElement.insertAfter(tr, item);
+    //       // this.activeprotocolids[item.uid].push(this.activeprotocol.length - 1);
+    //     }
+    //   }
+
+      if (item.uid in this.activeprotocolids) {
+        // trs aus activeprotocol löschen und id aus activeprotocolids löschen
+        this.activeprotocol.splice(
+          this.activeprotocolids[item.uid][0],
+          this.activeprotocolids[item.uid].length
+        );
+        delete this.activeprotocolids[item.uid];
+      } else {
+        this.activeprotocolids[item.uid] = [];
+        for (let i in this.protocol[item.uid]) {
+          console.log(i)
+          this.activeprotocol.push(this.protocol[item.uid][i]);
+          this.activeprotocolids[item.uid].push(this.activeprotocol.length - 1);
+        }
+      }
+      this.renderProtocol()
+    },
+    renderProtocol() {
+      let table = document.getElementById("myTable");
+      console.log(table);
+      let rows = table.getElementsByClassName("TR");
+      console.log(rows);
+      let protocolRows = table.getElementsByClassName("protocolTR");
+      console.log(protocolRows);
+      for (let i in rows) {
+        for (let j in protocolRows) {
+          console.log(rows[i]);
+          console.log(rows[i].id);
+          console.log(protocolRows[j]);
+          console.log(protocolRows[j].id);
+
+          if (protocolRows[j].id == rows[i].id) {
+            console.log(table, "ja");
+            // table.insertAfter(protocolRows[j], rows[i]);
+          }
+        }
+      }
+    },
     switchFilterRow() {
       if (this.filterRow == true) {
         this.filterRow = false;
@@ -699,7 +793,14 @@ export default {
 </script>
 
 <style scoped>
+.protocolTD {
+  background-color: lightgray;
+  /* box-shadow: inset 0px 4px 8px -5px rgba(50, 50, 50, 0.75), inset 0px -4px 8px -5px rgba(50, 50, 50, 0.75) */
+}
 .nodisplay {
+  display: none;
+}
+.hidden {
   display: none;
 }
 .floating_action_button {
@@ -726,6 +827,8 @@ tbody td:first-child {
   left: 0;
   z-index: 3;
   border-right: 1px solid #ccc;
+}
+tbody td:first-child:not(.protocolTD) {
   background-color: white;
 }
 thead th:last-child {
@@ -738,6 +841,8 @@ tbody td:last-child {
   right: 0;
   z-index: 3;
   border-left: 1px solid #ccc;
+}
+tbody td:last-child:not(.protocolTD) {
   background-color: white;
 }
 </style>
