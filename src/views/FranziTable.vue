@@ -79,6 +79,48 @@ export default {
             Erstelltam: "01.03.2020 11:00",
             Erstelltvon: "Francesco"
           }
+        ],
+        "1111": [
+          {
+            ref: "1111",
+            Kennzeichen: "M V 1339",
+            Mitarbeiter: "Jansen",
+            Kilometerstand: "1",
+            NächsterService: "02.05.2020",
+            Funktionsfähig: "true",
+            Erstelltam: "01.03.2020 11:00",
+            Erstelltvon: "Francesco"
+          },
+          {
+            ref: "1111",
+            Kennzeichen: "M V 1339",
+            Mitarbeiter: "Jansen",
+            Kilometerstand: "2",
+            NächsterService: "02.05.2020",
+            Funktionsfähig: "true",
+            Erstelltam: "01.03.2020 11:00",
+            Erstelltvon: "Francesco"
+          },
+          {
+            ref: "1111",
+            Kennzeichen: "M V 1339",
+            Mitarbeiter: "Jansen",
+            Kilometerstand: "3",
+            NächsterService: "02.05.2020",
+            Funktionsfähig: "true",
+            Erstelltam: "01.03.2020 11:00",
+            Erstelltvon: "Francesco"
+          },
+          {
+            ref: "1111",
+            Kennzeichen: "M V 1339",
+            Mitarbeiter: "Jansen",
+            Kilometerstand: "4",
+            NächsterService: "02.05.2020",
+            Funktionsfähig: "true",
+            Erstelltam: "01.03.2020 11:00",
+            Erstelltvon: "Francesco"
+          }
         ]
       }
     };

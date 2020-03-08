@@ -213,28 +213,27 @@
           </tr>
         </thead>
         <tbody id="myTable">
-          <template v-for="(item, index) in data">
-            <tr :key="index" :id="item.uid" class="TR">
-              <!-- <component
+          <tr v-for="(item, index) in data" :key="index" :id="item.uid" class="TR">
+            <!-- <component
               v-for="(header, index_column) in headers"
               :key="index_column"
               :is="component_mapping[String(header.type)]"
               v-bind:name="item[header.name]"
-              ></component>-->
-              <Cell
-                v-for="(header, index_column) in headers"
-                :key="index_column"
-                :component="header.type"
-                v-bind:name="item[header.name]"
-              ></Cell>
-              <td style="text-align: center">
-                <v-icon v-if="item.Files" small class="mr-2" @click="viewFile(item)">mdi-image</v-icon>
-                <v-icon small class="mr-2" @click="editItem(item, index)">mdi-pencil</v-icon>
-                <v-icon small class="mr-2" @click="toggleProtocol(item)">mdi-script</v-icon>
-                <v-icon small @click="deleteItem(item, index)">mdi-delete</v-icon>
-              </td>
-            </tr>
-            <template v-if="activeProtocol.length>0">
+            ></component>-->
+            <Cell
+              v-for="(header, index_column) in headers"
+              :key="index_column"
+              :component="header.type"
+              v-bind:name="item[header.name]"
+            ></Cell>
+            <td style="text-align: center">
+              <v-icon v-if="item.Files" small class="mr-2" @click="viewFile(item)">mdi-image</v-icon>
+              <v-icon small class="mr-2" @click="editItem(item, index)">mdi-pencil</v-icon>
+              <v-icon small class="mr-2" @click="toggleProtocol(item)">mdi-script</v-icon>
+              <v-icon small @click="deleteItem(item, index)">mdi-delete</v-icon>
+            </td>
+          </tr>
+          <!-- <template v-if="activeProtocol.length>0">
               <tr
                 v-for="(protocol_item, index1) in activeProtocol"
                 :key="index1"
@@ -251,7 +250,7 @@
                 <td class="protocolTD"></td>
               </tr>
             </template>
-          </template>
+          </template>-->
         </tbody>
       </template>
     </v-simple-table>
@@ -263,6 +262,7 @@
 // import TableCheckbox from "./table_checkbox";
 import Cell from "./Cell";
 import { setTimeout } from "timers";
+import Vue from "vue";
 // import { createDOM } from '../utils/utils';
 export default {
   props: {
@@ -323,7 +323,7 @@ export default {
       editedIndex: -1,
       editedItem: {},
       activeProtocol: [],
-      activeprotocolids: {}
+      activeprotocolids: []
     };
   },
   computed: {
@@ -357,63 +357,61 @@ export default {
       this.filesURL = [];
     },
     toggleProtocol(item) {
-      //   if (item.uid in this.activeprotocolids) {
-      //     //lalal
-      //   } else {
-      //     this.activeprotocolids[item.uid] = [];
-      //     for (let row of this.protocol[item.uid]) {
-      //       let td_list = [];
-      //       for (let header of this.headers) {
-      //           let td = createElement(Cell, {
-      //             props: {
-      //               key: j,
-      //               component: row[header.type],
-      //               name: row[header.name]
-      //             }
-      //           });
-      //           td_list.push(td)
-      //       }
-      //       let tr = createDOM("tr", [{"class": "protocolTR"}], "", td_list);
-      //       item.parentElement.insertAfter(tr, item);
-      //       // this.activeprotocolids[item.uid].push(this.activeprotocol.length - 1);
-      //     }
-      //   }
-      console.log(this.activeProtocol);
-      console.log(this.activeProtocol);
+      if (this.activeprotocolids.includes(item.uid)) {
+        let index = this.activeprotocolids.indexOf(item.uid)
+        this.activeprotocolids.splice(index, 1)
+        let trs = document.getElementsByClassName(item.uid)
+        for (let i = trs.length-1; i >= 0; i--) {
+          trs[i].remove()
+        }
+      } else {
+        this.activeprotocolids.push(item.uid)
 
-      for (let row of this.protocol[item.uid]) {
-        this.activeProtocol.push(row);
-      }
-      console.log(this.activeProtocol);
-      // for (let i in this.protocol[item.uid]) {
-      //   console.log(i);
-      //   this.activeProtocol.push(this.protocol[item.uid][i]);
-      //   this.activeprotocolids[item.uid].push(this.activeProtocol.length - 1);
-      // }
-
-      // this.renderProtocol();
-    },
-    renderProtocol() {
-      let table = document.getElementById("myTable");
-      console.log(table);
-      let rows = table.getElementsByClassName("TR");
-      console.log(rows);
-      let protocolRows = table.getElementsByClassName("protocolTR");
-      console.log(protocolRows);
-      for (let i in rows) {
-        for (let j in protocolRows) {
-          console.log(rows[i]);
-          console.log(rows[i].id);
-          console.log(protocolRows[j]);
-          console.log(protocolRows[j].id);
-
-          if (protocolRows[j].id == rows[i].id) {
-            console.log(table, "ja");
-            // table.insertAfter(protocolRows[j], rows[i]);
+        for (let row of this.protocol[item.uid]) {
+          let newTR = document.createElement("tr");
+          newTR.classList.add(item.uid);
+          newTR.classList.add("protocolTR");
+          for (let header of this.headers) {
+            let vmClass = Vue.extend(Cell);
+            let vm = new vmClass({
+              propsData: {
+                name: row[header.name],
+                component: "text" //header.type
+              }
+            });
+            vm.$mount();
+            vm.$el.classList.add("protocolTD");
+            newTR.appendChild(vm.$el);
           }
+          let extraTD = document.createElement("td");
+          extraTD.classList.add("protocolTD");
+          newTR.appendChild(extraTD);
+          let realRow = document.getElementById(item.uid);
+          realRow.parentNode.insertBefore(newTR, realRow.nextSibling);
         }
       }
     },
+    // renderProtocol() {
+    //   let table = document.getElementById("myTable");
+    //   console.log(table);
+    //   let rows = table.getElementsByClassName("TR");
+    //   console.log(rows);
+    //   let protocolRows = table.getElementsByClassName("protocolTR");
+    //   console.log(protocolRows);
+    //   for (let i in rows) {
+    //     for (let j in protocolRows) {
+    //       console.log(rows[i]);
+    //       console.log(rows[i].id);
+    //       console.log(protocolRows[j]);
+    //       console.log(protocolRows[j].id);
+
+    //       if (protocolRows[j].id == rows[i].id) {
+    //         console.log(table, "ja");
+    //         // table.insertAfter(protocolRows[j], rows[i]);
+    //       }
+    //     }
+    //   }
+    // },
     switchFilterRow() {
       if (this.filterRow == true) {
         this.filterRow = false;
@@ -863,9 +861,9 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .protocolTD {
-  background-color: lightgray;
+  background-color: lightgray !important;
   /* box-shadow: inset 0px 4px 8px -5px rgba(50, 50, 50, 0.75), inset 0px -4px 8px -5px rgba(50, 50, 50, 0.75) */
 }
 .nodisplay {
