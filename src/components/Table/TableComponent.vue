@@ -13,7 +13,7 @@
       <v-icon>mdi-plus</v-icon>
     </v-btn>
     <!-- MODAL -->
-    <v-dialog v-model="dialog" max-width="500px">
+    <v-dialog v-model="dialog" scrollable persistent max-width="500px">
       <v-card>
         <v-card-title>
           <span class="headline">{{ formTitle }}</span>
@@ -24,14 +24,34 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="12" sm="12" md="12" v-for="(header, index) in headers" :key="index">
+            <v-col
+              cols="12"
+              sm="12"
+              md="12"
+              class="py-0"
+              v-for="(header, index) in headers"
+              :key="index"
+            >
               <v-text-field
                 v-if="header.name!='Erstelltam' && header.name!='Erstelltvon'"
                 v-model="editedItem[header.name]"
                 :label="header.name"
               ></v-text-field>
             </v-col>
+            <v-col cols="12" sm="12" md="12" class="py-0 pt-2">
+              <v-file-input
+                v-model="files"
+                label="Datei"
+                multiple
+                chips
+                outlined
+                accept=".png, .jpg"
+                placeholder="Datei auswählen"
+                @change="onFilePicked()"
+              ></v-file-input>
+            </v-col>
           </v-row>
+          <v-img class="my-2" v-for="(file, i) in files" :key="file" :src="filesURL[i]"></v-img>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -40,7 +60,7 @@
       </v-card>
     </v-dialog>
     <!-- MODAL COLUMN -->
-    <v-dialog v-model="dialogColumn" max-width="500px">
+    <v-dialog v-model="dialogColumn" scrollable persistent max-width="500px">
       <v-card>
         <v-card-title>
           <span class="headline">Column</span>
@@ -67,7 +87,7 @@
       </v-card>
     </v-dialog>
     <!-- MODAL FILTER -->
-    <v-dialog v-model="dialogFilter" max-width="500px">
+    <v-dialog v-model="dialogFilter" scrollable persistent max-width="500px">
       <v-card>
         <v-card-title>
           <span class="headline">Neuer Filter</span>
@@ -119,6 +139,21 @@
             @click="addFilter(filterHeader, filterOperator, val1, val2)"
           >Filter</v-btn>
         </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- VIEWER -->
+    <v-dialog v-model="viewer" scrollable persistent max-width="1000px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Viewer</span>
+          <v-spacer></v-spacer>
+          <v-btn text fab small @click="closeViewer()">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
+          <v-img class="my-2" v-for="(file, i) in files" :key="file" :src="filesURL[i]"></v-img>
+        </v-card-text>
       </v-card>
     </v-dialog>
     <!-- TABLE -->
@@ -192,6 +227,7 @@
               v-bind:name="item[header.name]"
             ></Cell>
             <td style="text-align: center">
+              <v-icon v-if="item.Files" small class="mr-2" @click="viewFile(item)">mdi-image</v-icon>
               <v-icon small class="mr-2" @click="editItem(item, index)">mdi-pencil</v-icon>
               <v-icon small class="mr-2" @click="toggleProtocol(item)">mdi-script</v-icon>
               <v-icon small @click="deleteItem(item, index)">mdi-delete</v-icon>
@@ -250,7 +286,9 @@ export default {
   },
   data() {
     return {
-      table123: [],
+      files: [],
+      filesURL: [],
+      viewer: false,
       search: "",
       dialog: false,
       dialogColumn: false,
@@ -290,28 +328,52 @@ export default {
     }
   },
   methods: {
+    onFilePicked() {
+      // console.log("before", this.files);
+      // console.log("before", this.filesURL);
+      for (let file of this.files) {
+        const fileReader = new FileReader();
+
+        fileReader.addEventListener("load", () => {
+          this.filesURL.push(fileReader.result);
+        });
+        fileReader.readAsDataURL(file);
+      }
+      // console.log("after", this.files);
+      // console.log("after", this.filesURL);
+    },
+    viewFile(item) {
+      this.files = item.Files;
+      this.onFilePicked();
+      this.viewer = true;
+    },
+    closeViewer() {
+      this.viewer = false;
+      this.files = [];
+      this.filesURL = [];
+    },
     toggleProtocol(item) {
-    //   if (item.uid in this.activeprotocolids) {
-    //     //lalal
-    //   } else {
-    //     this.activeprotocolids[item.uid] = [];
-    //     for (let row of this.protocol[item.uid]) {
-    //       let td_list = [];
-    //       for (let header of this.headers) {
-    //           let td = createElement(Cell, {
-    //             props: {
-    //               key: j,
-    //               component: row[header.type],
-    //               name: row[header.name]
-    //             }
-    //           });
-    //           td_list.push(td)
-    //       }
-    //       let tr = createDOM("tr", [{"class": "protocolTR"}], "", td_list);
-    //       item.parentElement.insertAfter(tr, item);
-    //       // this.activeprotocolids[item.uid].push(this.activeprotocol.length - 1);
-    //     }
-    //   }
+      //   if (item.uid in this.activeprotocolids) {
+      //     //lalal
+      //   } else {
+      //     this.activeprotocolids[item.uid] = [];
+      //     for (let row of this.protocol[item.uid]) {
+      //       let td_list = [];
+      //       for (let header of this.headers) {
+      //           let td = createElement(Cell, {
+      //             props: {
+      //               key: j,
+      //               component: row[header.type],
+      //               name: row[header.name]
+      //             }
+      //           });
+      //           td_list.push(td)
+      //       }
+      //       let tr = createDOM("tr", [{"class": "protocolTR"}], "", td_list);
+      //       item.parentElement.insertAfter(tr, item);
+      //       // this.activeprotocolids[item.uid].push(this.activeprotocol.length - 1);
+      //     }
+      //   }
 
       if (item.uid in this.activeprotocolids) {
         // trs aus activeprotocol löschen und id aus activeprotocolids löschen
@@ -323,12 +385,12 @@ export default {
       } else {
         this.activeprotocolids[item.uid] = [];
         for (let i in this.protocol[item.uid]) {
-          console.log(i)
+          console.log(i);
           this.activeprotocol.push(this.protocol[item.uid][i]);
           this.activeprotocolids[item.uid].push(this.activeprotocol.length - 1);
         }
       }
-      this.renderProtocol()
+      this.renderProtocol();
     },
     renderProtocol() {
       let table = document.getElementById("myTable");
@@ -382,6 +444,12 @@ export default {
       this.editedItem["Erstelltam"] = now;
       this.editedItem["Erstelltvon"] = this.$store.getters["user/name"];
 
+      if (this.files.length > 0) {
+        this.editedItem["Files"] = this.files;
+        this.files = [];
+        this.filesURL = [];
+      }
+
       if (this.editedIndex > -1) {
         Object.assign(this.data[this.editedIndex], this.editedItem);
       } else {
@@ -401,6 +469,8 @@ export default {
     close() {
       this.dialog = false;
       setTimeout(() => {
+        this.files = [];
+        this.filesURL = [];
         this.editedItem = {};
         this.editedIndex = -1;
       }, 300);
