@@ -213,41 +213,45 @@
           </tr>
         </thead>
         <tbody id="myTable">
-          <tr v-for="(item, index) in data" :key="index" :id="item.uid" class="TR">
-            <!-- <component
+          <template v-for="(item, index) in data">
+            <tr :key="index" :id="item.uid" class="TR">
+              <!-- <component
               v-for="(header, index_column) in headers"
               :key="index_column"
               :is="component_mapping[String(header.type)]"
               v-bind:name="item[header.name]"
-            ></component>-->
-            <Cell
-              v-for="(header, index_column) in headers"
-              :key="index_column"
-              :component="header.type"
-              v-bind:name="item[header.name]"
-            ></Cell>
-            <td style="text-align: center">
-              <v-icon v-if="item.Files" small class="mr-2" @click="viewFile(item)">mdi-image</v-icon>
-              <v-icon small class="mr-2" @click="editItem(item, index)">mdi-pencil</v-icon>
-              <v-icon small class="mr-2" @click="toggleProtocol(item)">mdi-script</v-icon>
-              <v-icon small @click="deleteItem(item, index)">mdi-delete</v-icon>
-            </td>
-          </tr>
-          <tr
-            v-for="(protocol_item, protocol_index) in activeprotocol"
-            :key="protocol_index"
-            :id="protocol_item.ref"
-            class="protocolTR"
-          >
-            <Cell
-              v-for="(header, protocol_index_column) in headers"
-              :key="protocol_index_column"
-              class="protocolTD"
-              :component="header.type"
-              v-bind:name="protocol_item[header.name]"
-            ></Cell>
-            <td class="protocolTD"></td>
-          </tr>
+              ></component>-->
+              <Cell
+                v-for="(header, index_column) in headers"
+                :key="index_column"
+                :component="header.type"
+                v-bind:name="item[header.name]"
+              ></Cell>
+              <td style="text-align: center">
+                <v-icon v-if="item.Files" small class="mr-2" @click="viewFile(item)">mdi-image</v-icon>
+                <v-icon small class="mr-2" @click="editItem(item, index)">mdi-pencil</v-icon>
+                <v-icon small class="mr-2" @click="toggleProtocol(item)">mdi-script</v-icon>
+                <v-icon small @click="deleteItem(item, index)">mdi-delete</v-icon>
+              </td>
+            </tr>
+            <template v-if="activeProtocol.length>0">
+              <tr
+                v-for="(protocol_item, index1) in activeProtocol"
+                :key="index1"
+                :id="protocol_item.ref"
+                class="protocolTR"
+              >
+                <Cell
+                  v-for="(header, protocol_index_column) in headers"
+                  :key="protocol_index_column"
+                  class="protocolTD"
+                  :component="header.type"
+                  v-bind:name="protocol_item[header.name]"
+                ></Cell>
+                <td class="protocolTD"></td>
+              </tr>
+            </template>
+          </template>
         </tbody>
       </template>
     </v-simple-table>
@@ -318,7 +322,7 @@ export default {
       // },
       editedIndex: -1,
       editedItem: {},
-      activeprotocol: [],
+      activeProtocol: [],
       activeprotocolids: {}
     };
   },
@@ -374,23 +378,20 @@ export default {
       //       // this.activeprotocolids[item.uid].push(this.activeprotocol.length - 1);
       //     }
       //   }
+      console.log(this.activeProtocol);
+      console.log(this.activeProtocol);
 
-      if (item.uid in this.activeprotocolids) {
-        // trs aus activeprotocol löschen und id aus activeprotocolids löschen
-        this.activeprotocol.splice(
-          this.activeprotocolids[item.uid][0],
-          this.activeprotocolids[item.uid].length
-        );
-        delete this.activeprotocolids[item.uid];
-      } else {
-        this.activeprotocolids[item.uid] = [];
-        for (let i in this.protocol[item.uid]) {
-          console.log(i);
-          this.activeprotocol.push(this.protocol[item.uid][i]);
-          this.activeprotocolids[item.uid].push(this.activeprotocol.length - 1);
-        }
+      for (let row of this.protocol[item.uid]) {
+        this.activeProtocol.push(row);
       }
-      this.renderProtocol();
+      console.log(this.activeProtocol);
+      // for (let i in this.protocol[item.uid]) {
+      //   console.log(i);
+      //   this.activeProtocol.push(this.protocol[item.uid][i]);
+      //   this.activeprotocolids[item.uid].push(this.activeProtocol.length - 1);
+      // }
+
+      // this.renderProtocol();
     },
     renderProtocol() {
       let table = document.getElementById("myTable");
