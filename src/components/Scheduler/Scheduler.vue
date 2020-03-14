@@ -1,5 +1,63 @@
 <template>
   <div class="tcontainer">
+    <!-- SnackBar -->
+    <v-snackbar color="red" v-model="snackbar">
+      {{ text }}
+      <v-btn color="white" text @click="snackbar = false">Close</v-btn>
+    </v-snackbar>
+    <!-- FLOATING BUTTON -->
+    <v-btn
+      class="floating_action_button mb-12"
+      @click="newBlockierungOpen=true"
+      dark
+      fab
+      bottom
+      right
+      color="red"
+    >
+      <v-icon>mdi-plus</v-icon>
+    </v-btn>
+    <!-- CREATE BLOCKIERUNG -->
+    <v-dialog v-model="newBlockierungOpen" width="500">
+      <v-card color="grey lighten-4" flat>
+        <!-- EVENT TITLE TOOLBAR -->
+        <v-toolbar dark>
+          <v-toolbar-title>Neue Blockierung</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn text fab dark small @click="newBlockierungOpen=false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <!-- CONTENT -->
+        <v-row>
+          <v-col cols="2">
+            <v-list-item>Start:</v-list-item>
+          </v-col>
+          <v-col cols="10">
+            <v-list-item>
+              <v-icon>mdi-calendar</v-icon>
+              <input class="pa-2" type="date" v-model="newBlockierung.start">
+            </v-list-item>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="2">
+            <v-list-item>Ende:</v-list-item>
+          </v-col>
+          <v-col cols="10">
+            <v-list-item>
+              <v-icon>mdi-calendar</v-icon>
+              <input class="pa-2" type="date" v-model="newBlockierung.end">
+            </v-list-item>
+          </v-col>
+        </v-row>
+        <v-card-actions>
+          <v-btn text color="primary" @click="acceptBlockierung()">Speichern</v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- TOOLBAR -->
     <div>
       <v-row align="center">
         <v-btn icon @click="prevMonth">
@@ -12,7 +70,7 @@
         <v-btn icon @click="nextMonth">
           <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
-        <h1>{{ title }}</h1>
+        <h1 class="ml-2">{{ title }}</h1>
         <v-spacer></v-spacer>
         <v-col cols="3" class="pt-0 pb-2">
           <v-text-field v-model="search" label="Suche" hide-details :onkeyup="searchFunction()"></v-text-field>
@@ -22,12 +80,18 @@
         </v-btn>
       </v-row>
     </div>
-    <v-simple-table fixed-header height="90vh">
+    <!-- SCHEDULER -->
+    <v-simple-table fixed-header height="80vh">
       <template v-slot:default>
         <thead>
           <tr>
             <th class="name_header">Mitarbeiter Name</th>
-            <th v-for="(n,i) in days" :key="i" :class="[isToday(n) ? {today:true} : {}]">
+            <th
+              v-for="(n,i) in days"
+              :key="i"
+              :style="[isBlocked(n)]"
+              v-on:click="manageBlocked(n)"
+            >
               <v-col>
                 <v-row align="center" justify="center">{{n}}</v-row>
                 <v-row align="center" justify="center">{{getDayOfWeek(n)}}</v-row>
@@ -77,13 +141,14 @@
       <v-card color="grey lighten-4" flat>
         <!-- EVENT TITLE TOOLBAR -->
         <v-toolbar dark>
-          <v-toolbar-title>{{selectedEventText[this.selectedEvent.status]}}</v-toolbar-title>
+          <v-toolbar-title v-if="selectedEventText[this.selectedEvent.status]">{{selectedEventText[this.selectedEvent.status]}}</v-toolbar-title>
+          <v-toolbar-title v-else>Blockierung Löschen?</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn text fab dark small @click="selectedOpen=false">
+          <v-btn text fab dark small @click="clearAndCloseModal()">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-row>
+        <v-row v-if="this.selectedEvent.type != 'Blockierung'">
           <v-col cols="2" class="pb-0">
             <v-list-item>Name:</v-list-item>
           </v-col>
@@ -91,7 +156,7 @@
             <v-list-item>{{this.selectedName}}</v-list-item>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="this.selectedEvent.type != 'Blockierung'">
           <v-col cols="2" class="pb-0">
             <v-list-item>Grund:</v-list-item>
           </v-col>
@@ -137,9 +202,13 @@ export default {
     selectedEventText: {
       angefragt: "Anfrage bestätigen?",
       storniert: "Stornierung bestätigen?",
-      bestätigt: "Absage erteilen?"
+      bestätigt: "Absage erteilen?",
     },
     selectedOpen: false,
+    newBlockierungOpen: false,
+    newBlockierung: {},
+    text: "",
+    snackbar: false,
     currentDate: new Date(),
     lazyImage: require("@/assets/avatar-icon-png-9.jpg"),
     types: {
@@ -149,6 +218,10 @@ export default {
   }),
   props: {
     data: {
+      type: Array,
+      required: true
+    },
+    Blockierungen: {
       type: Array,
       required: true
     }
@@ -200,6 +273,8 @@ export default {
         this.data[this.findWithAttr(this.data, "name", this.selectedName)][
           "events"
         ].splice(this.selectedIndex, 1);
+      } else if (this.selectedEvent.status == "Blockierung") {
+        this.Blockierungen.splice(this.selectedIndex, 1);
       }
       this.clearAndCloseModal();
     },
@@ -239,7 +314,6 @@ export default {
 
       this.currentDate = new Date(oldDate.getFullYear(), oldDate.getMonth(), 0);
     },
-
     isToday(day) {
       let today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -300,6 +374,64 @@ export default {
       }
       return {};
     },
+    isBlocked(tag) {
+      let tod = new Date(
+        this.currentDate.getFullYear(),
+        this.currentDate.getMonth(),
+        tag
+      );
+      tod = Date.parse(tod);
+      for (let index = 0; index < this.Blockierungen.length; index++) {
+        let startTime = Date.parse(
+          this.Blockierungen[index]["start"] + " 00:00"
+        );
+        let endTime = Date.parse(this.Blockierungen[index]["end"] + " 00:00");
+        if (tod >= startTime && tod <= endTime) {
+          let cssProperty = {};
+          cssProperty["background"] = "#ff4500";
+          return cssProperty;
+        }
+      }
+      return {};
+    },
+    manageBlocked(tag) {
+      let tod = new Date(
+        this.currentDate.getFullYear(),
+        this.currentDate.getMonth(),
+        tag
+      );
+      tod = Date.parse(tod);
+      for (let index = 0; index < this.Blockierungen.length; index++) {
+        let startTime = Date.parse(
+          this.Blockierungen[index]["start"] + " 00:00"
+        );
+        let endTime = Date.parse(this.Blockierungen[index]["end"] + " 00:00");
+        if (tod >= startTime && tod <= endTime) {
+          this.selectedOpen = true;
+          this.selectedEvent = this.Blockierungen[index];
+          this.selectedIndex = index;
+          this.selectedEvent.type = "Blockierung";
+        }
+      }
+    },
+    acceptBlockierung() {
+      if (!this.newBlockierung.start || !this.newBlockierung.end) {
+        this.text = "Start Tag und End Tag müssen eingetragen sein";
+        this.snackbar = true;
+        return;
+      }
+      if (this.newBlockierung.start > this.newBlockierung.end) {
+        this.text = "Start muss vor Ende liegen du GEILE SAU!";
+        this.snackbar = true;
+        return;
+      }
+      this.newBlockierung.status = "bestätigt"
+      this.newBlockierung.name = "Blockierung"
+      this.newBlockierung.color = "#ff4500"
+      this.Blockierungen.push(this.newBlockierung)
+      this.newBlockierung = {}
+      this.newBlockierungOpen = false
+    },
     getWorkingHours(element, tag) {
       // tage zwischen element.start und element.end markieren
       let tod = new Date(
@@ -339,7 +471,7 @@ export default {
           }
         }
       }
-      return workingHours ?  Number(workingHours).toFixed(2) : workingHours;
+      return workingHours ? Number(workingHours).toFixed(2) : workingHours;
     },
     getDayOfWeek(day) {
       let date = new Date(
@@ -406,8 +538,12 @@ export default {
 </script>
 
 <style scoped>
-th.today {
-  background: rgba(0, 0, 0, 0.06) !important;
+.floating_action_button {
+  position: absolute;
+  bottom: -10px;
+  right: 28px;
+  transform: translate(0px, -0px);
+  z-index: 900;
 }
 .work {
   background: lightgreen;

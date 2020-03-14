@@ -17,6 +17,7 @@
     >
       <v-icon>mdi-plus</v-icon>
     </v-btn>
+    <!-- TOOLBAR -->
     <v-col class="pa-0">
       <v-sheet height="64">
         <v-toolbar flat color="white">
@@ -47,6 +48,7 @@
           </v-menu>
         </v-toolbar>
       </v-sheet>
+      <!-- CALENDAR -->
       <v-sheet height="80vh">
         <v-calendar
           ref="calendar"
@@ -66,7 +68,6 @@
           @mousedown:day="startAlldayEvent"
           @mouseup:day="endAlldayEvent"
         ></v-calendar>
-
         <!-- EVENT MENU -->
         <v-dialog v-model="selectedOpen" width="500">
           <v-card color="grey lighten-4" flat>
@@ -203,6 +204,30 @@ export default {
     eventHovered: false,
     events: [
       {
+        name: "Blockierung",
+        start: "2020-02-11",
+        end: "2020-02-14",
+        color: "#ff4500",
+        type: "Blockierung",
+        status: "bestätigt"
+      },
+      {
+        name: "Blockierung",
+        start: "2020-03-01",
+        end: "2020-03-04",
+        color: "#ff4500",
+        type: "Blockierung",
+        status: "bestätigt"
+      },
+      {
+        name: "Blockierung",
+        start: "2020-03-11",
+        end: "2020-03-14",
+        color: "#ff4500",
+        type: "Blockierung",
+        status: "bestätigt"
+      },
+      {
         name: "Urlaub",
         start: "2020-02-17",
         end: "2020-02-18",
@@ -322,47 +347,47 @@ export default {
       this.selectedEvent.status = "angefragt";
       this.selectedOpen = true;
     },
-    startCreating({ date, time }) {
-      if (this.eventHovered) {
-        return;
-      }
-      let newEvent = {
-        name: "New Event",
-        start: [date, time].join(" "),
-        end: [date, time].join(" "),
-        color: "#C5C5C5",
-        status: "angefragt",
-        type: "Anwesenheit"
-      };
-      this.events.push(newEvent);
-      this.renderEvent = true;
-    },
-    endCreating() {
-      // console.log("time", time);
-      this.renderEvent = false;
-    },
-    startAlldayEvent(event) {
-      if (!this.eventHovered) {
-        this.renderAllDayEvent = true;
-        this.newAllDayEvent = {
-          name: "Urlaub",
-          start: event.date,
-          end: event.date,
-          type: "Abwesenheit",
-          color: "#C5C5C5",
-          status: "angefragt",
-          abwesenheitsGrund: "Urlaub"
-        };
-      }
-    },
-    endAlldayEvent(event) {
-      if (this.renderAllDayEvent) {
-        this.renderAllDayEvent = false;
-        this.newAllDayEvent["end"] = event.date;
-        this.events.push(this.newAllDayEvent);
-        this.newAllDayEvent = {};
-      }
-    },
+    // startCreating({ date, time }) {
+    //   if (this.eventHovered) {
+    //     return;
+    //   }
+    //   let newEvent = {
+    //     name: "New Event",
+    //     start: [date, time].join(" "),
+    //     end: [date, time].join(" "),
+    //     color: "#C5C5C5",
+    //     status: "angefragt",
+    //     type: "Anwesenheit"
+    //   };
+    //   this.events.push(newEvent);
+    //   this.renderEvent = true;
+    // },
+    // endCreating() {
+    //   this.renderEvent = false;
+    // },
+    // startAlldayEvent(event) {
+    //   if (!this.eventHovered) {
+    //     this.renderAllDayEvent = true;
+    //     this.newAllDayEvent = {
+    //       name: "Urlaub",
+    //       start: event.date,
+    //       end: event.date,
+    //       type: "Abwesenheit",
+    //       color: "#C5C5C5",
+    //       status: "angefragt",
+    //       abwesenheitsGrund: "Urlaub"
+    //     };
+    //   }
+    // },
+    // endAlldayEvent(event) {
+    //   if (this.renderAllDayEvent) {
+    //     this.renderAllDayEvent = false;
+    //     this.newAllDayEvent["end"] = event.date;
+
+    //     this.events.push(this.newAllDayEvent);
+    //     this.newAllDayEvent = {};
+    //   }
+    // },
     // is triggered when new Calender week is renderd
     updateRange({ start, end }) {
       this.start = start;
@@ -390,6 +415,9 @@ export default {
       return [splittedDateTime[0], splittedDateTime[1]];
     },
     showEvent({ nativeEvent, event }) {
+      if (event.type == "Blockierung") {
+        return;
+      }
       const open = () => {
         this.selectedEvent = event;
         this.selectedEventIndex = this.events.indexOf(event);
@@ -463,12 +491,32 @@ export default {
       }
       return false;
     },
+    checkBlockierung(event) {
+      let newStartTime;
+      let newEndTime;
+      newStartTime = Date.parse(event.start + " 00:00");
+      newEndTime = Date.parse(event.end + " 23:59");
+      for (let index = 0; index < this.events.length; index++) {
+        if (this.events[index]["type"] == "Blockierung") {
+          let startTime = Date.parse(this.events[index]["start"] + " 00:00");
+          let endTime = Date.parse(this.events[index]["end"] + " 23:59");
+          if (newStartTime <= startTime && newEndTime > startTime) {
+            console.log("olga1")
+            return true;
+          }
+          if (newStartTime > startTime && newStartTime < endTime) {
+            console.log("olga2")
+            return true;
+          }
+        }
+      }
+      return false;
+    },
     validateEvent() {
       if (
         this.selectedEvent.type == "Abwesenheit" &&
         !this.abwesenheitsGrund.includes(this.selectedEvent.abwesenheitsGrund)
       ) {
-        console.log("reinindieolga");
         this.text = "Abwesenheits Grund nicht gesetzt";
         this.snackbar = true;
         return true;
@@ -576,8 +624,15 @@ export default {
         this.snackbar = true;
         return;
       }
-      this.events.push(updatedEvent);
-      this.clearAndCloseModal();
+      if (updatedEvent.type == "Abwesenheit") {
+        if (this.checkBlockierung(updatedEvent) == true) {
+          this.text =
+            "Achtung! An diesem Tag ist eine Blockierung eingetragen!";
+          this.snackbar = true;
+        }
+        this.events.push(updatedEvent);
+        this.clearAndCloseModal();
+      }
     }
   }
 };
@@ -586,12 +641,12 @@ export default {
 <style scoped >
 .floating_action_button {
   position: absolute;
-  bottom: 0px;
+  bottom: -20px;
   right: 28px;
   transform: translate(0px, -0px);
   z-index: 900;
 }
-/deep/ ::selection {
+::v-deep ::selection {
   background-color: initial;
   color: inherit;
   text-shadow: initial;

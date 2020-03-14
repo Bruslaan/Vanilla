@@ -45,13 +45,16 @@
                 multiple
                 chips
                 outlined
-                accept=".png, .jpg"
+                accept=".png, .jpg, .pdf"
                 placeholder="Datei auswählen"
                 @change="onFilePicked()"
               ></v-file-input>
             </v-col>
           </v-row>
-          <v-img class="my-2" v-for="(file, i) in files" :key="file" :src="filesURL[i]"></v-img>
+          <template v-for="(file, i) in files">
+            <v-img v-if="chechType(file)" class="my-2" :key="file" :src="filesURL[i]"></v-img>
+            <!-- <pdf v-if="file.type=='application/pdf'" class="my-2" :key="file" :src="filesURL[i]"></pdf> -->
+          </template>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -152,7 +155,10 @@
           </v-btn>
         </v-card-title>
         <v-card-text>
-          <v-img class="my-2" v-for="(file, i) in files" :key="file" :src="filesURL[i]"></v-img>
+          <template v-for="(file, i) in files">
+            <v-img v-if="chechType(file)" class="my-2" :key="file" :src="filesURL[i]"></v-img>
+            <pdf v-if="file.type=='application/pdf'" class="my-2" :key="file" :src="filesURL[i]"></pdf>
+          </template>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -263,6 +269,7 @@
 import Cell from "./Cell";
 import { setTimeout } from "timers";
 import Vue from "vue";
+import pdf from "vue-pdf";
 // import { createDOM } from '../utils/utils';
 export default {
   props: {
@@ -286,7 +293,8 @@ export default {
   components: {
     // TableText,
     // TableCheckbox,
-    Cell
+    Cell,
+    pdf
   },
   data() {
     return {
@@ -332,6 +340,13 @@ export default {
     }
   },
   methods: {
+    chechType(file) {
+      console.log(file)
+      if ((file.type == "image/jpeg") | (file.type == "image/png")) {
+        console.log("drinnen")
+        return true;
+      }
+    },
     onFilePicked() {
       // console.log("before", this.files);
       // console.log("before", this.filesURL);
@@ -358,14 +373,14 @@ export default {
     },
     toggleProtocol(item) {
       if (this.activeprotocolids.includes(item.uid)) {
-        let index = this.activeprotocolids.indexOf(item.uid)
-        this.activeprotocolids.splice(index, 1)
-        let trs = document.getElementsByClassName(item.uid)
-        for (let i = trs.length-1; i >= 0; i--) {
-          trs[i].remove()
+        let index = this.activeprotocolids.indexOf(item.uid);
+        this.activeprotocolids.splice(index, 1);
+        let trs = document.getElementsByClassName(item.uid);
+        for (let i = trs.length - 1; i >= 0; i--) {
+          trs[i].remove();
         }
       } else {
-        this.activeprotocolids.push(item.uid)
+        this.activeprotocolids.push(item.uid);
 
         for (let row of this.protocol[item.uid]) {
           let newTR = document.createElement("tr");
@@ -376,42 +391,25 @@ export default {
             let vm = new vmClass({
               propsData: {
                 name: row[header.name],
-                component: "text" //header.type
+                component: header.type //text
               }
             });
             vm.$mount();
             vm.$el.classList.add("protocolTD");
+            
             newTR.appendChild(vm.$el);
           }
+          
+          // action buttons
           let extraTD = document.createElement("td");
           extraTD.classList.add("protocolTD");
           newTR.appendChild(extraTD);
+
           let realRow = document.getElementById(item.uid);
           realRow.parentNode.insertBefore(newTR, realRow.nextSibling);
         }
       }
     },
-    // renderProtocol() {
-    //   let table = document.getElementById("myTable");
-    //   console.log(table);
-    //   let rows = table.getElementsByClassName("TR");
-    //   console.log(rows);
-    //   let protocolRows = table.getElementsByClassName("protocolTR");
-    //   console.log(protocolRows);
-    //   for (let i in rows) {
-    //     for (let j in protocolRows) {
-    //       console.log(rows[i]);
-    //       console.log(rows[i].id);
-    //       console.log(protocolRows[j]);
-    //       console.log(protocolRows[j].id);
-
-    //       if (protocolRows[j].id == rows[i].id) {
-    //         console.log(table, "ja");
-    //         // table.insertAfter(protocolRows[j], rows[i]);
-    //       }
-    //     }
-    //   }
-    // },
     switchFilterRow() {
       if (this.filterRow == true) {
         this.filterRow = false;
@@ -792,7 +790,6 @@ export default {
         if (check) {
           // console.log(test)
         } else {
-          // tr[i].style.display = "none";
           tr[i].classList.add("nodisplay");
         }
       }
@@ -849,27 +846,15 @@ export default {
       this.filters_arguments.splice(index, 1);
       this.apply_filters_arguments();
     }
-    // findWithAttr(array, attr, value) {
-    //   for (var i = 0; i < array.length; i += 1) {
-    //     if (array[i][attr] === value) {
-    //       return i;
-    //     }
-    //   }
-    //   return -1;
-    // }
   }
 };
 </script>
 
-<style>
-.protocolTD {
-  background-color: lightgray !important;
-  /* box-shadow: inset 0px 4px 8px -5px rgba(50, 50, 50, 0.75), inset 0px -4px 8px -5px rgba(50, 50, 50, 0.75) */
+<style scoped>
+::v-deep .protocolTD {
+  background-color: rgb(236, 236, 236);
 }
 .nodisplay {
-  display: none;
-}
-.hidden {
   display: none;
 }
 .floating_action_button {
@@ -880,7 +865,7 @@ export default {
   z-index: 900;
 }
 thead th,
-tbody td {
+::v-deep tbody td {
   position: -webkit-sticky; /* for Safari */
   position: sticky;
   top: 0;
@@ -892,7 +877,7 @@ thead th:first-child {
   border-right: 1px solid #ccc;
   background-color: white;
 }
-tbody td:first-child {
+::v-deep tbody td:first-child {
   left: 0;
   z-index: 3;
   border-right: 1px solid #ccc;
@@ -906,7 +891,7 @@ thead th:last-child {
   border-left: 1px solid #ccc;
   background-color: white;
 }
-tbody td:last-child {
+::v-deep tbody td:last-child {
   right: 0;
   z-index: 3;
   border-left: 1px solid #ccc;

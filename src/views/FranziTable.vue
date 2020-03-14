@@ -75,7 +75,7 @@ export default {
             Mitarbeiter: "Brusssssss",
             Kilometerstand: "0",
             NächsterService: "03.03.2020",
-            Funktionsfähig: "true",
+            Funktionsfähig: "false",
             Erstelltam: "01.03.2020 11:00",
             Erstelltvon: "Francesco"
           }
