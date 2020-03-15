@@ -141,7 +141,7 @@
       <v-card color="grey lighten-4" flat>
         <!-- EVENT TITLE TOOLBAR -->
         <v-toolbar dark>
-          <v-toolbar-title v-if="selectedEventText[this.selectedEvent.status]">{{selectedEventText[this.selectedEvent.status]}}</v-toolbar-title>
+          <v-toolbar-title v-if="this.selectedEvent.type != 'Blockierung'">{{selectedEventText[this.selectedEvent.status]}}</v-toolbar-title>
           <v-toolbar-title v-else>Blockierung Löschen?</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn text fab dark small @click="clearAndCloseModal()">
