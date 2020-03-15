@@ -98,6 +98,18 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/profilePageFranzi',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'ProfilePageFranzi',
+        component: () => import('../views/ProfilePageFranzi'),
+        meta: { title: 'ProfilePageFranzi', icon: 'mdi-calendar-text' }
+      }
+    ]
+  },
   // {
   //   path: '/anwesenheit',
   //   component: Layout,

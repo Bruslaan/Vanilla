@@ -89,7 +89,7 @@
             <th
               v-for="(n,i) in days"
               :key="i"
-              :style="[isBlocked(n)]"
+              v-bind:style="[isBlocked(n)]"
               v-on:click="manageBlocked(n)"
             >
               <v-col>
@@ -128,7 +128,7 @@
             <td
               v-for="(n,i2) in days"
               :key="i2"
-              :style="[ hasActiveEvents(element, n)]"
+              v-bind:style="[ hasActiveEvents(element, n)]"
               v-on:click="testfunction(element, n)"
             >{{getWorkingHours(element, n)}}</td>
           </tr>
@@ -245,10 +245,10 @@ export default {
         n = Date.parse(n);
         for (let index = 0; index < element.events.length; index++) {
           if (element.events[index]["type"] == "Abwesenheit") {
-            let startTime = Date.parse(
+            let startTime = this.toMilliseconds(
               element.events[index]["start"] + " 00:00"
             );
-            let endTime = Date.parse(element.events[index]["end"] + " 00:00");
+            let endTime = this.toMilliseconds(element.events[index]["end"] + " 00:00");
             if (n >= startTime && n <= endTime) {
               this.selectedOpen = true;
               this.selectedEvent = element.events[index];
@@ -260,7 +260,9 @@ export default {
       }
     },
     acceptEvent() {
-      if (this.selectedEvent.status == "angefragt") {
+      if (this.selectedEvent.type == "Blockierung") {
+        this.Blockierungen.splice(this.selectedIndex, 1);
+      } else if (this.selectedEvent.status == "angefragt") {
         this.selectedEvent.status = "bestätigt";
         this.selectedEvent.color =
           settings.eventColorMapping[this.selectedEvent["type"]][
@@ -273,9 +275,7 @@ export default {
         this.data[this.findWithAttr(this.data, "name", this.selectedName)][
           "events"
         ].splice(this.selectedIndex, 1);
-      } else if (this.selectedEvent.status == "Blockierung") {
-        this.Blockierungen.splice(this.selectedIndex, 1);
-      }
+      } 
       this.clearAndCloseModal();
     },
     declineEvent() {
@@ -327,6 +327,17 @@ export default {
       }
       return false;
     },
+    toMilliseconds(datum) {
+      let splitted = datum.split("-")
+      let year = splitted[0]
+      let month = splitted[1]-1
+      let day = splitted[2].split(" ")[0]
+      let hours = splitted[2].split(" ")[1].split(":")[0]
+      let minutes = splitted[2].split(" ")[1].split(":")[1]
+
+      let newTime = new Date(year, month, day, hours, minutes)
+      return Date.parse(newTime)
+    },
     hasActiveEvents(element, tag) {
       // tage zwischen element.start und element.end markieren
       let n = new Date(
@@ -337,9 +348,8 @@ export default {
       n = Date.parse(n);
       for (let index = 0; index < element.events.length; index++) {
         if (element.events[index]["type"] == "Abwesenheit") {
-          let startTime = Date.parse(element.events[index]["start"] + " 00:00");
-          let endTime = Date.parse(element.events[index]["end"] + " 00:00");
-
+          let startTime = this.toMilliseconds(element.events[index]["start"] + " 00:00");
+          let endTime = this.toMilliseconds(element.events[index]["end"] + " 00:00");
           if (n >= startTime && n <= endTime) {
             // event found
             let color = element.events[index]["color"];
@@ -382,10 +392,10 @@ export default {
       );
       tod = Date.parse(tod);
       for (let index = 0; index < this.Blockierungen.length; index++) {
-        let startTime = Date.parse(
+        let startTime = this.toMilliseconds(
           this.Blockierungen[index]["start"] + " 00:00"
         );
-        let endTime = Date.parse(this.Blockierungen[index]["end"] + " 00:00");
+        let endTime = this.toMilliseconds(this.Blockierungen[index]["end"] + " 00:00");
         if (tod >= startTime && tod <= endTime) {
           let cssProperty = {};
           cssProperty["background"] = "#ff4500";
@@ -402,10 +412,10 @@ export default {
       );
       tod = Date.parse(tod);
       for (let index = 0; index < this.Blockierungen.length; index++) {
-        let startTime = Date.parse(
+        let startTime = this.toMilliseconds(
           this.Blockierungen[index]["start"] + " 00:00"
         );
-        let endTime = Date.parse(this.Blockierungen[index]["end"] + " 00:00");
+        let endTime = this.toMilliseconds(this.Blockierungen[index]["end"] + " 00:00");
         if (tod >= startTime && tod <= endTime) {
           this.selectedOpen = true;
           this.selectedEvent = this.Blockierungen[index];
@@ -443,10 +453,10 @@ export default {
       let workingHours = "";
       for (let index = 0; index < element.events.length; index++) {
         if (element.events[index]["type"] == "Anwesenheit") {
-          let startTime = Date.parse(
+          let startTime = this.toMilliseconds(
             element.events[index]["start"].split(" ")[0] + " 00:00"
           );
-          let endTime = Date.parse(
+          let endTime = this.toMilliseconds(
             element.events[index]["end"].split(" ")[0] + " 00:00"
           );
           if (tod >= startTime && tod <= endTime) {
