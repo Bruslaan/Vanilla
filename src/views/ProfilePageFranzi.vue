@@ -6,18 +6,6 @@ export default {
     return {
       tab: null,
       items: ["Info", "Anwesenheit", "Abwesenheit", "Rollen", "Vertrag"],
-      // PersonalInformation: {
-      //   Vorname: "Josef",
-      //   Nachname: "Meier",
-      //   Wohnort: "Maraschki Straße 12",
-      //   SteuerID: 12
-      // },
-      // AndereInformationen: {
-      //   Bank: "Mascha Kascha",
-      //   "Name des Kontoinhabers": "Meier",
-      //   IBAN: "as123asdRoll",
-      //   BIC: "22222"
-      // },
       InfoFields: {
         Account: [
           {
@@ -71,6 +59,9 @@ export default {
             value: "franzi du geile Schlange, keiner kann so oft und so lange!"
           }
         ]
+      },
+      VertragFields: {
+        
       }
     };
   }
@@ -129,6 +120,11 @@ export default {
         <v-tab-item>
           <v-card color="basil" flat>
             <v-layout wrap class="pa-3 mt-5">TAB 4 ETC</v-layout>
+          </v-card>
+        </v-tab-item>
+                <v-tab-item>
+          <v-card color="basil" flat>
+            <v-layout wrap class="pa-3 mt-5">Vertrag</v-layout>
           </v-card>
         </v-tab-item>
       </v-tabs-items>
