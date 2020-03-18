@@ -11,7 +11,7 @@
         </v-btn>
         <h1 class="ml-2">{{ title }}</h1>
 
-        <v-btn @click="getEventCounts">LALLALALALAALALALAL</v-btn>
+        <v-btn @click="getEventCounter('Krankheit', 'angefragt')">LALLALALALAALALALAL</v-btn>
       </v-row>
     </v-toolbar>
 
@@ -20,15 +20,17 @@
         text1="Urlaubstage"
         text2="Übrig"
         text3="Anzahl an übrigen Urlaubstagen"
-        zahl1="20"
+        :zahl1="getÜbrig()"
         :zahl2="getUrlaubstageGesamt()"
-        color1="orange"
+        color1="rgba(255, 223, 101, 0.87)"
       ></AbwesenheitCard>
+    </v-row>
+    <v-row>
       <AbwesenheitCard
         text1="Urlaubstage"
         text2="Angefragt"
         text3="Anzahl an angefragten Urlaubstagen"
-        zahl1="5"
+        :zahl1="getEventCounter('Urlaub', 'angefragt')"
         :zahl2="getUrlaubstageGesamt()"
         color1="orange"
       ></AbwesenheitCard>
@@ -36,7 +38,15 @@
         text1="Urlaubstage"
         text2="Bestätigt"
         text3="Anzahl an bestätigten Urlaubstagen"
-        zahl1="5"
+        :zahl1="getEventCounter('Urlaub', 'bestätigt')"
+        :zahl2="getUrlaubstageGesamt()"
+        color1="orange"
+      ></AbwesenheitCard>
+      <AbwesenheitCard
+        text1="Urlaubstage"
+        text2="Storniert"
+        text3="Anzahl an stornierten Urlaubstagen"
+        :zahl1="getEventCounter('Urlaub', 'storniert')"
         :zahl2="getUrlaubstageGesamt()"
         color1="orange"
       ></AbwesenheitCard>
@@ -46,16 +56,24 @@
         text1="Krankheit"
         text2="Angefragt"
         text3="Anzahl an angefragten Krankheitstagen"
-        zahl1="5"
-        zahl2="30"
+        :zahl1="getEventCounter('Krankheit', 'angefragt')"
+        :zahl2="getKrankheitTotal()"
         color1="rgb(164, 61, 255)"
       ></AbwesenheitCard>
       <AbwesenheitCard
         text1="Krankheit"
         text2="Bestätigt"
         text3="Anzahl an bestätigten Krankheitstagen"
-        zahl1="5"
-        zahl2="30"
+        :zahl1="getEventCounter('Krankheit', 'bestätigt')"
+        :zahl2="getKrankheitTotal()"
+        color1="rgb(164, 61, 255)"
+      ></AbwesenheitCard>
+      <AbwesenheitCard
+        text1="Krankheit"
+        text2="Storniert"
+        text3="Anzahl an stornierten Krankheitstagen"
+        :zahl1="getEventCounter('Krankheit', 'storniert')"
+        :zahl2="getKrankheitTotal()"
         color1="rgb(164, 61, 255)"
       ></AbwesenheitCard>
     </v-row>
@@ -64,16 +82,24 @@
         text1="Feiertage"
         text2="Angefragt"
         text3="Anzahl an angefragten Feiertagen"
-        zahl1="5"
-        zahl2="30"
+        :zahl1="getEventCounter('Feiertag', 'angefragt')"
+        :zahl2="getFeiertageTotal()"
         color1="rgb(82, 255, 61)"
       ></AbwesenheitCard>
       <AbwesenheitCard
         text1="Feiertage"
         text2="Bestätigt"
         text3="Anzahl an bestätigten Feiertagen"
-        zahl1="5"
-        zahl2="30"
+        :zahl1="getEventCounter('Feiertag', 'bestätigt')"
+        :zahl2="getFeiertageTotal()"
+        color1="rgb(82, 255, 61)"
+      ></AbwesenheitCard>
+      <AbwesenheitCard
+        text1="Feiertage"
+        text2="Storniert"
+        text3="Anzahl an stornierten Feiertagen"
+        :zahl1="getEventCounter('Feiertag', 'storniert')"
+        :zahl2="getFeiertageTotal()"
         color1="rgb(82, 255, 61)"
       ></AbwesenheitCard>
     </v-row>
@@ -151,7 +177,6 @@ export default {
         (laufzeit == "unbefristet" && startYear != refYear) ||
         (laufzeit == "befristet" && startYear != refYear && endYear != refYear)
       ) {
-        console.log(Math.round(UrlaubProMonat * 12));
         return Math.round(UrlaubProMonat * 12);
       } else if (
         (laufzeit == "unbefristet" && startYear == refYear) ||
@@ -167,7 +192,6 @@ export default {
         ).getDate();
         let totalUrlaubDays =
           ((refTotalMonthDays - startDay) / refTotalMonthDays) * UrlaubProMonat;
-        console.log(Math.round(totalUrlaubMonth + totalUrlaubDays));
         return Math.round(totalUrlaubMonth + totalUrlaubDays);
       } else if (
         laufzeit == "befristet" &&
@@ -179,7 +203,6 @@ export default {
 
         let refTotalMonthDays = new Date(endYear, endMonth - 1, 0).getDate();
         let totalUrlaubDays = (endDay / refTotalMonthDays) * UrlaubProMonat;
-        console.log(Math.round(totalUrlaubMonth + totalUrlaubDays));
         return Math.round(totalUrlaubMonth + totalUrlaubDays);
       } else if (
         laufzeit == "befristet" &&
@@ -206,13 +229,6 @@ export default {
         let totalUrlaubDaysEndingMonth =
           (endDay / refTotalMonthDaysEndingMonth) *
           refTotalMonthDaysEndingMonth;
-        console.log(
-          Math.round(
-            totalUrlaubMonth +
-              totalUrlaubDaysStartingMonth +
-              totalUrlaubDaysEndingMonth
-          )
-        );
         return Math.round(
           totalUrlaubMonth +
             totalUrlaubDaysStartingMonth +
@@ -220,12 +236,51 @@ export default {
         );
       }
     },
-    getEventCounts() {
-      let Urlaub_events = this.events.filter(
-        e => e.name === "Urlaub" && e.status === "angefragt"
+    getEventCounter(type, status) {
+      // TODO filter nach jahr!
+      let filtered_events = this.events.filter(
+        e => e.name === type && e.status === status
       );
-
-      console.log(Urlaub_events)
+      let counter = 0;
+      for (let event of filtered_events) {
+        const date1 = new Date(
+          event.start.split("-")[0],
+          event.start.split("-")[1] - 1,
+          event.start.split("-")[2]
+        );
+        const date2 = new Date(
+          event.end.split("-")[0],
+          event.end.split("-")[1] - 1,
+          event.end.split("-")[2]
+        );
+        const diffTime = Math.abs(date2 - date1);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        counter += diffDays;
+      }
+      console.log(counter);
+      return counter;
+    },
+    getÜbrig() {
+      return (
+        this.getUrlaubstageGesamt() -
+        this.getEventCounter("Urlaub", "angefragt") -
+        this.getEventCounter("Urlaub", "bestätigt") -
+        this.getEventCounter("Urlaub", "storniert")
+      );
+    },
+    getKrankheitTotal() {
+      return (
+        this.getEventCounter("Krankheit", "angefragt") +
+        this.getEventCounter("Krankheit", "bestätigt") +
+        this.getEventCounter("Krankheit", "storniert")
+      );
+    },
+    getFeiertageTotal() {
+      return (
+        this.getEventCounter("Feiertag", "angefragt") +
+        this.getEventCounter("Feiertag", "bestätigt") +
+        this.getEventCounter("Feiertag", "storniert")
+      );
     }
   }
 };

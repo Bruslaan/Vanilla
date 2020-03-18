@@ -245,6 +245,15 @@ export default {
         },
         {
           name: "Urlaub",
+          start: "2020-05-15",
+          end: "2020-05-16",
+          color: "#FFB63D",
+          type: "Abwesenheit",
+          status: "storniert",
+          abwesenheitsGrund: "Urlaub"
+        },
+        {
+          name: "Urlaub",
           start: "2020-01-10",
           end: "2020-01-15",
           color: "#FFB63D",
