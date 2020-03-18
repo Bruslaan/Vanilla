@@ -82,7 +82,7 @@ export default {
             options: ["befristet", "unbefristet"],
             value: "unbefristet"
           },
-          { name: "Start", type: "date", value: "2020-05-01" },
+          { name: "Start", type: "date", value: "2019-05-01" },
           { name: "Ende", type: "date", value: "" },
           { name: "Probezeit", type: "text", value: "6 Monate" },
           { name: "Kündigunsfrist", type: "text", value: "3 Monate" }
@@ -240,16 +240,43 @@ export default {
           end: "2020-02-18",
           color: "#C5C5C5",
           type: "Abwesenheit",
-          status: "angefragt",
+          status: "bestätigt",
           abwesenheitsGrund: "Urlaub"
         },
         {
           name: "Urlaub",
-          start: "2020-02-19",
-          end: "2020-02-19",
+          start: "2020-01-10",
+          end: "2020-01-15",
           color: "#FFB63D",
           type: "Abwesenheit",
           status: "bestätigt",
+          abwesenheitsGrund: "Urlaub"
+        },
+        {
+          name: "Urlaub",
+          start: "2020-02-27",
+          end: "2020-02-28",
+          color: "#C5C5C5",
+          type: "Abwesenheit",
+          status: "bestätigt",
+          abwesenheitsGrund: "Urlaub"
+        },
+        {
+          name: "Urlaub",
+          start: "2020-03-27",
+          end: "2020-03-28",
+          color: "#C5C5C5",
+          type: "Abwesenheit",
+          status: "bestätigt",
+          abwesenheitsGrund: "Urlaub"
+        },
+        {
+          name: "Urlaub",
+          start: "2020-04-09",
+          end: "2020-04-14",
+          color: "#C5C5C5",
+          type: "Abwesenheit",
+          status: "angefragt",
           abwesenheitsGrund: "Urlaub"
         },
         {
@@ -285,6 +312,15 @@ export default {
           end: "2020-02-22",
           color: "#C5C5C5",
           type: "Abwesenheit",
+          status: "bestätigt",
+          abwesenheitsGrund: "Krankheit"
+        },
+        {
+          name: "Krankheit",
+          start: "2020-02-24",
+          end: "2020-02-25",
+          color: "#C5C5C5",
+          type: "Abwesenheit",
           status: "angefragt",
           abwesenheitsGrund: "Krankheit"
         },
@@ -292,6 +328,15 @@ export default {
           name: "Feiertag",
           start: "2020-02-23",
           end: "2020-02-23",
+          color: "#C5C5C5",
+          type: "Abwesenheit",
+          status: "bestätigt",
+          abwesenheitsGrund: "Feiertag"
+        },
+        {
+          name: "Feiertag",
+          start: "2020-04-01",
+          end: "2020-04-01",
           color: "#C5C5C5",
           type: "Abwesenheit",
           status: "angefragt",
@@ -352,7 +397,11 @@ export default {
         <v-tab-item>
           <v-card color="basil" flat>
             <v-layout wrap class="pa-3 mt-5">
-              <Abwesenheit :events="events" :Urlaubsanspruch="VertragFields.Urlaubsanspruch" :Vertrag="VertragFields.Vertrag"></Abwesenheit>
+              <Abwesenheit
+                :events="events"
+                :Urlaubsanspruch="VertragFields.Urlaubsanspruch"
+                :Vertrag="VertragFields.Vertrag"
+              ></Abwesenheit>
             </v-layout>
           </v-card>
         </v-tab-item>

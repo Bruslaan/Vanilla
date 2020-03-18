@@ -11,7 +11,7 @@
         </v-btn>
         <h1 class="ml-2">{{ title }}</h1>
 
-        <v-btn @click="getUrlaubstageGesamt">LALLALALALAALALALAL</v-btn>
+        <v-btn @click="getEventCounts">LALLALALALAALALALAL</v-btn>
       </v-row>
     </v-toolbar>
 
@@ -21,7 +21,7 @@
         text2="Übrig"
         text3="Anzahl an übrigen Urlaubstagen"
         zahl1="20"
-        zahl2="30"
+        :zahl2="getUrlaubstageGesamt()"
         color1="orange"
       ></AbwesenheitCard>
       <AbwesenheitCard
@@ -29,7 +29,7 @@
         text2="Angefragt"
         text3="Anzahl an angefragten Urlaubstagen"
         zahl1="5"
-        zahl2="30"
+        :zahl2="getUrlaubstageGesamt()"
         color1="orange"
       ></AbwesenheitCard>
       <AbwesenheitCard
@@ -37,7 +37,7 @@
         text2="Bestätigt"
         text3="Anzahl an bestätigten Urlaubstagen"
         zahl1="5"
-        zahl2="30"
+        :zahl2="getUrlaubstageGesamt()"
         color1="orange"
       ></AbwesenheitCard>
     </v-row>
@@ -219,6 +219,13 @@ export default {
             totalUrlaubDaysEndingMonth
         );
       }
+    },
+    getEventCounts() {
+      let Urlaub_events = this.events.filter(
+        e => e.name === "Urlaub" && e.status === "angefragt"
+      );
+
+      console.log(Urlaub_events)
     }
   }
 };
