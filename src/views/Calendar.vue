@@ -19,7 +19,6 @@
     </v-btn>
     <!-- TOOLBAR -->
     <v-col class="pa-0">
-      <v-sheet height="64">
         <v-toolbar flat color="white">
           <v-btn fab text small color="grey darken-2" @click="prev">
             <v-icon small>mdi-chevron-left</v-icon>
@@ -47,7 +46,6 @@
             </v-list>
           </v-menu>
         </v-toolbar>
-      </v-sheet>
       <!-- CALENDAR -->
       <v-sheet height="80vh">
         <v-calendar

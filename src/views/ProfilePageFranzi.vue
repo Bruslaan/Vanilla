@@ -1,6 +1,6 @@
 <script>
 import InformationenFranzi from "../components/InformationenFranzi";
-import Abwesenheit from "../components/Abwesenheit";
+import Abwesenheit from "../components/Abwesenheit/Abwesenheit";
 
 export default {
   components: { InformationenFranzi, Abwesenheit },
@@ -82,7 +82,7 @@ export default {
             options: ["befristet", "unbefristet"],
             value: "unbefristet"
           },
-          { name: "Start", type: "date", value: "2020-01-01" },
+          { name: "Start", type: "date", value: "2020-05-01" },
           { name: "Ende", type: "date", value: "" },
           { name: "Probezeit", type: "text", value: "6 Monate" },
           { name: "Kündigunsfrist", type: "text", value: "3 Monate" }
@@ -352,7 +352,7 @@ export default {
         <v-tab-item>
           <v-card color="basil" flat>
             <v-layout wrap class="pa-3 mt-5">
-              <Abwesenheit :events="events" :Urlaubsanspruch="VertragFields.Urlaubsanspruch"></Abwesenheit>
+              <Abwesenheit :events="events" :Urlaubsanspruch="VertragFields.Urlaubsanspruch" :Vertrag="VertragFields.Vertrag"></Abwesenheit>
             </v-layout>
           </v-card>
         </v-tab-item>

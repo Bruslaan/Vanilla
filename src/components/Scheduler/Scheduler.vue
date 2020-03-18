@@ -58,28 +58,26 @@
       </v-card>
     </v-dialog>
     <!-- TOOLBAR -->
-    <div>
+    <v-toolbar flat color="white">
       <v-row align="center">
         <v-btn icon @click="prevMonth">
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
-        <!-- <v-btn icon @click="heute">
-          <v-icon>mdi-calendar-month</v-icon>
-        </v-btn>-->
         <v-btn @click="heute" text>Heute</v-btn>
         <v-btn icon @click="nextMonth">
           <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
         <h1 class="ml-2">{{ title }}</h1>
         <v-spacer></v-spacer>
-        <v-col cols="3" class="pt-0 pb-2">
-          <v-text-field v-model="search" label="Suche" hide-details :onkeyup="searchFunction()"></v-text-field>
-        </v-col>
-        <v-btn icon @click="heute">
-          <v-icon>mdi-settings</v-icon>
-        </v-btn>
+        <v-text-field
+          style="max-width: 200px; margin-left: auto"
+          v-model="search"
+          label="Suche"
+          hide-details
+          :onkeyup="searchFunction()"
+        ></v-text-field>
       </v-row>
-    </div>
+    </v-toolbar>
     <!-- SCHEDULER -->
     <v-simple-table fixed-header height="80vh">
       <template v-slot:default>
@@ -141,7 +139,9 @@
       <v-card color="grey lighten-4" flat>
         <!-- EVENT TITLE TOOLBAR -->
         <v-toolbar dark>
-          <v-toolbar-title v-if="this.selectedEvent.type != 'Blockierung'">{{selectedEventText[this.selectedEvent.status]}}</v-toolbar-title>
+          <v-toolbar-title
+            v-if="this.selectedEvent.type != 'Blockierung'"
+          >{{selectedEventText[this.selectedEvent.status]}}</v-toolbar-title>
           <v-toolbar-title v-else>Blockierung Löschen?</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn text fab dark small @click="clearAndCloseModal()">
@@ -202,7 +202,7 @@ export default {
     selectedEventText: {
       angefragt: "Anfrage bestätigen?",
       storniert: "Stornierung bestätigen?",
-      bestätigt: "Absage erteilen?",
+      bestätigt: "Absage erteilen?"
     },
     selectedOpen: false,
     newBlockierungOpen: false,
@@ -248,7 +248,9 @@ export default {
             let startTime = this.toMilliseconds(
               element.events[index]["start"] + " 00:00"
             );
-            let endTime = this.toMilliseconds(element.events[index]["end"] + " 00:00");
+            let endTime = this.toMilliseconds(
+              element.events[index]["end"] + " 00:00"
+            );
             if (n >= startTime && n <= endTime) {
               this.selectedOpen = true;
               this.selectedEvent = element.events[index];
@@ -275,7 +277,7 @@ export default {
         this.data[this.findWithAttr(this.data, "name", this.selectedName)][
           "events"
         ].splice(this.selectedIndex, 1);
-      } 
+      }
       this.clearAndCloseModal();
     },
     declineEvent() {
@@ -328,15 +330,15 @@ export default {
       return false;
     },
     toMilliseconds(datum) {
-      let splitted = datum.split("-")
-      let year = splitted[0]
-      let month = splitted[1]-1
-      let day = splitted[2].split(" ")[0]
-      let hours = splitted[2].split(" ")[1].split(":")[0]
-      let minutes = splitted[2].split(" ")[1].split(":")[1]
+      let splitted = datum.split("-");
+      let year = splitted[0];
+      let month = splitted[1] - 1;
+      let day = splitted[2].split(" ")[0];
+      let hours = splitted[2].split(" ")[1].split(":")[0];
+      let minutes = splitted[2].split(" ")[1].split(":")[1];
 
-      let newTime = new Date(year, month, day, hours, minutes)
-      return Date.parse(newTime)
+      let newTime = new Date(year, month, day, hours, minutes);
+      return Date.parse(newTime);
     },
     hasActiveEvents(element, tag) {
       // tage zwischen element.start und element.end markieren
@@ -348,8 +350,12 @@ export default {
       n = Date.parse(n);
       for (let index = 0; index < element.events.length; index++) {
         if (element.events[index]["type"] == "Abwesenheit") {
-          let startTime = this.toMilliseconds(element.events[index]["start"] + " 00:00");
-          let endTime = this.toMilliseconds(element.events[index]["end"] + " 00:00");
+          let startTime = this.toMilliseconds(
+            element.events[index]["start"] + " 00:00"
+          );
+          let endTime = this.toMilliseconds(
+            element.events[index]["end"] + " 00:00"
+          );
           if (n >= startTime && n <= endTime) {
             // event found
             let color = element.events[index]["color"];
@@ -395,7 +401,9 @@ export default {
         let startTime = this.toMilliseconds(
           this.Blockierungen[index]["start"] + " 00:00"
         );
-        let endTime = this.toMilliseconds(this.Blockierungen[index]["end"] + " 00:00");
+        let endTime = this.toMilliseconds(
+          this.Blockierungen[index]["end"] + " 00:00"
+        );
         if (tod >= startTime && tod <= endTime) {
           let cssProperty = {};
           cssProperty["background"] = "#ff4500";
@@ -415,7 +423,9 @@ export default {
         let startTime = this.toMilliseconds(
           this.Blockierungen[index]["start"] + " 00:00"
         );
-        let endTime = this.toMilliseconds(this.Blockierungen[index]["end"] + " 00:00");
+        let endTime = this.toMilliseconds(
+          this.Blockierungen[index]["end"] + " 00:00"
+        );
         if (tod >= startTime && tod <= endTime) {
           this.selectedOpen = true;
           this.selectedEvent = this.Blockierungen[index];
@@ -435,12 +445,12 @@ export default {
         this.snackbar = true;
         return;
       }
-      this.newBlockierung.status = "bestätigt"
-      this.newBlockierung.name = "Blockierung"
-      this.newBlockierung.color = "#ff4500"
-      this.Blockierungen.push(this.newBlockierung)
-      this.newBlockierung = {}
-      this.newBlockierungOpen = false
+      this.newBlockierung.status = "bestätigt";
+      this.newBlockierung.name = "Blockierung";
+      this.newBlockierung.color = "#ff4500";
+      this.Blockierungen.push(this.newBlockierung);
+      this.newBlockierung = {};
+      this.newBlockierungOpen = false;
     },
     getWorkingHours(element, tag) {
       // tage zwischen element.start und element.end markieren
