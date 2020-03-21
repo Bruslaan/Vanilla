@@ -101,18 +101,23 @@
           <tr v-for="(element,i1) in data" :key="i1">
             <th class="name_header">
               <v-row align="center">
-                <v-col cols="9" class="pt-2 pb-2">
-                  <v-avatar class="mr-1" size="36">
-                    <v-img :src="`https://i.pravatar.cc/10${i1}`" alt="John">
-                      <template v-slot:placeholder>
-                        <v-row class="fill-height ma-0" align="center" justify="center">
-                          <v-progress-circular indeterminate color="grey lighten-2"></v-progress-circular>
-                        </v-row>
-                      </template>
-                    </v-img>
-                  </v-avatar>
-                  {{element.name}}
-                </v-col>
+                <v-tooltip right>
+                  <template v-slot:activator="{ on }">
+                    <v-col v-on="on" cols="9" class="pt-2 pb-2">
+                      <v-avatar class="mr-1" size="36">
+                        <v-img :src="`https://i.pravatar.cc/10${i1}`" alt="John">
+                          <template v-slot:placeholder>
+                            <v-row class="fill-height ma-0" align="center" justify="center">
+                              <v-progress-circular indeterminate color="grey lighten-2"></v-progress-circular>
+                            </v-row>
+                          </template>
+                        </v-img>
+                      </v-avatar>
+                      {{element.name}}
+                    </v-col>
+                  </template>
+                  <SchedulerTooltip :events="element.events" :currentDate="currentDate"></SchedulerTooltip>
+                </v-tooltip>
                 <v-col cols="3" class="pt-2 pb-2 ml-auto">
                   <v-checkbox
                     v-if="checkIfEventsAreValid(element)"
@@ -201,8 +206,11 @@
 
 <script>
 import settings from "@/settings";
-
+import SchedulerTooltip from "./SchedulerTooltip";
 export default {
+  components: {
+    SchedulerTooltip
+  },
   data: () => ({
     search: "",
     selectedEvent: {},
@@ -244,6 +252,33 @@ export default {
       }
       return -1;
     },
+    // manageCheckbox(element) {
+    //   // if checkbox was set to TRUE
+    //   console.log("before", element.events);
+    //   if (element.monatBestätigt[this.getCurrentYearAndMonth()] == true) {
+    //     let workEvents = element.events.filter(e => e.type === "Anwesenheit");
+
+    //     let refYear = this.currentDate.getFullYear();
+    //     let refMonth = this.currentDate.getMonth() + 1;
+
+    //     for (let event of workEvents) {
+    //       let startYear = Number(event.start.split("-")[0]);
+    //       let endYear = Number(event.end.split("-")[0]);
+    //       let startMonth = Number(event.start.split("-")[1]);
+    //       let endMonth = Number(event.end.split("-")[1]);
+
+    //       if (
+    //         startYear == refYear &&
+    //         startMonth == refMonth &&
+    //         endYear == refYear && endMonth == refMonth
+    //       ) {
+    //         event.status == "bestätigt";
+    //         console.log("drinnen in der olga")
+    //       }
+    //     }
+    //     console.log("after", element.events);
+    //   }
+    // },
     checkIfEventsAreValid(element) {
       let validEvents = element.events.filter(
         e =>

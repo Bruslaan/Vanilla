@@ -200,7 +200,7 @@ export default {
     renderAllDayEvent: false,
     eventToRender: null,
     eventHovered: false,
-    // events are all events and all blockierungen
+    // events are all events of an user and all blockierungen
     events: [
       {
         name: "Blockierung",
