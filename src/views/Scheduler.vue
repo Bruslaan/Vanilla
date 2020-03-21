@@ -9,17 +9,6 @@ import Scheduler from "../components/Scheduler/Scheduler";
 
 export default {
   computed: {},
-  watch: {
-    Mitarbeiter: {
-      // This will let Vue know to look inside the array
-      deep: true,
-
-      // We have to move our method to a handler field
-      handler() {
-        console.log(this.Mitarbeiter);
-      }
-    }
-  },
   components: { Scheduler },
   data() {
     return {
@@ -182,7 +171,7 @@ export default {
         },
         {
           name: "Jansen von Olga",
-          monatBestätigt: true,
+          monatBestätigt: {},
           events: [
             {
               name: "Urlaub",
@@ -230,7 +219,7 @@ export default {
         },
         {
           name: "Jansen von Royale",
-          monatBestätigt: true,
+          monatBestätigt: {},
           events: [
             {
               name: "Urlaub",
@@ -278,55 +267,7 @@ export default {
         },
         {
           name: "Jansen von Royale",
-          monatBestätigt: true,
-          events: [
-            {
-              name: "Urlaub",
-              start: "2020-02-05",
-              end: "2020-02-10",
-              color: "#C5C5C5",
-              type: "Abwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Urlaub"
-            },
-            {
-              name: "Arbeit",
-              start: "2020-02-20 06:00",
-              end: "2020-02-20 12:00",
-              color: "#C5C5C5",
-              type: "Anwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Arbeit"
-            }
-          ]
-        },
-        {
-          name: "Jansen von Royale",
           monatBestätigt: {},
-          events: [
-            {
-              name: "Urlaub",
-              start: "2020-02-05",
-              end: "2020-02-10",
-              color: "#C5C5C5",
-              type: "Abwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Urlaub"
-            },
-            {
-              name: "Arbeit",
-              start: "2020-02-20 06:00",
-              end: "2020-02-20 12:00",
-              color: "#C5C5C5",
-              type: "Anwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Arbeit"
-            }
-          ]
-        },
-        {
-          name: "Jansen von Royale",
-          monatBestätigt: true,
           events: [
             {
               name: "Urlaub",
@@ -446,7 +387,55 @@ export default {
         },
         {
           name: "Jansen von Royale",
-          monatBestätigt: true,
+          monatBestätigt: {},
+          events: [
+            {
+              name: "Urlaub",
+              start: "2020-02-05",
+              end: "2020-02-10",
+              color: "#C5C5C5",
+              type: "Abwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Urlaub"
+            },
+            {
+              name: "Arbeit",
+              start: "2020-02-20 06:00",
+              end: "2020-02-20 12:00",
+              color: "#C5C5C5",
+              type: "Anwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Arbeit"
+            }
+          ]
+        },
+        {
+          name: "Jansen von Royale",
+          monatBestätigt: {},
+          events: [
+            {
+              name: "Urlaub",
+              start: "2020-02-05",
+              end: "2020-02-10",
+              color: "#C5C5C5",
+              type: "Abwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Urlaub"
+            },
+            {
+              name: "Arbeit",
+              start: "2020-02-20 06:00",
+              end: "2020-02-20 12:00",
+              color: "#C5C5C5",
+              type: "Anwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Arbeit"
+            }
+          ]
+        },
+        {
+          name: "Jansen von Royale",
+          monatBestätigt: {},
           events: [
             {
               name: "Urlaub",

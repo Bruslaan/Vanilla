@@ -115,8 +115,17 @@
                 </v-col>
                 <v-col cols="3" class="pt-2 pb-2 ml-auto">
                   <v-checkbox
+                    v-if="checkIfEventsAreValid(element)"
                     class="ma-0"
-                    v-model="element.monatBestätigt[getCurrentYearAndMonth()]"            
+                    v-model="element.monatBestätigt[getCurrentYearAndMonth()]"
+                    color="success"
+                    hide-details
+                    disabled
+                  ></v-checkbox>
+                  <v-checkbox
+                    v-else
+                    class="ma-0"
+                    v-model="element.monatBestätigt[getCurrentYearAndMonth()]"
                     color="success"
                     hide-details
                   ></v-checkbox>
@@ -235,21 +244,45 @@ export default {
       }
       return -1;
     },
+    checkIfEventsAreValid(element) {
+      let validEvents = element.events.filter(
+        e =>
+          e.type === "Abwesenheit" &&
+          (e.status == "angefragt" || e.status == "storniert")
+      );
+
+      let refYear = this.currentDate.getFullYear();
+      let refMonth = this.currentDate.getMonth() + 1;
+
+      for (let event of validEvents) {
+        let startYear = Number(event.start.split("-")[0]);
+        let endYear = Number(event.end.split("-")[0]);
+        let startMonth = Number(event.start.split("-")[1]);
+        let endMonth = Number(event.end.split("-")[1]);
+
+        if (
+          (startYear == refYear && startMonth == refMonth) |
+          (endYear == refYear && endMonth == refMonth)
+        ) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    },
     getCurrentYearAndMonth() {
       let year = String(this.currentDate.getFullYear());
       let month = String(this.currentDate.getMonth() + 1).padStart(2, "0");
-      return year + "-" + month
+      return year + "-" + month;
     },
     checkAccepted(element) {
       let year = String(this.currentDate.getFullYear());
       let month = String(this.currentDate.getMonth() + 1).padStart(2, "0");
-      let accepted = element.monatBestätigt.find(
-        e => e.name === year + "-" + month
-      )
+      let accepted = element.monatBestätigt[year + "-" + month];
       if (!accepted) {
-        return false
+        return false;
       } else {
-        return true
+        return true;
       }
     },
     testfunction(element, tag) {
