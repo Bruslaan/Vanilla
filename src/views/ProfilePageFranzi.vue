@@ -208,31 +208,15 @@ export default {
           }
         ]
       },
-
       events: [
         {
-          name: "Blockierung",
-          start: "2020-02-11",
-          end: "2020-02-14",
-          color: "#ff4500",
-          type: "Blockierung",
-          status: "bestätigt"
-        },
-        {
-          name: "Blockierung",
-          start: "2020-03-01",
-          end: "2020-03-04",
-          color: "#ff4500",
-          type: "Blockierung",
-          status: "bestätigt"
-        },
-        {
-          name: "Blockierung",
-          start: "2020-03-11",
-          end: "2020-03-14",
-          color: "#ff4500",
-          type: "Blockierung",
-          status: "bestätigt"
+          name: "Urlaub",
+          start: "2019-12-25",
+          end: "2020-01-01",
+          color: "#C5C5C5",
+          type: "Abwesenheit",
+          status: "bestätigt",
+          abwesenheitsGrund: "Urlaub"
         },
         {
           name: "Urlaub",

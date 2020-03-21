@@ -116,7 +116,7 @@
                 <v-col cols="3" class="pt-2 pb-2 ml-auto">
                   <v-checkbox
                     class="ma-0"
-                    v-model="element.monatBestätigt"
+                    v-model="element.monatBestätigt[findWithAttr(element.monatBestätigt, name, getCurrentYearAndMonth())].status"
                     color="success"
                     hide-details
                   ></v-checkbox>
@@ -235,8 +235,25 @@ export default {
       }
       return -1;
     },
+    getCurrentYearAndMonth() {
+      let year = String(this.currentDate.getFullYear());
+      let month = String(this.currentDate.getMonth() + 1).padStart(2, "0");
+      return year + "-" + month
+    },
+    checkAccepted(element) {
+      let year = String(this.currentDate.getFullYear());
+      let month = String(this.currentDate.getMonth() + 1).padStart(2, "0");
+      let accepted = element.monatBestätigt.find(
+        e => e.name === year + "-" + month
+      )
+      if (!accepted) {
+        return false
+      } else {
+        return true
+      }
+    },
     testfunction(element, tag) {
-      if (element.monatBestätigt == false) {
+      if (this.checkAccepted(element) == false) {
         let n = new Date(
           this.currentDate.getFullYear(),
           this.currentDate.getMonth(),
@@ -531,7 +548,6 @@ export default {
       let days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
       return days;
     },
-
     title() {
       let monthArray = [
         "Januar",

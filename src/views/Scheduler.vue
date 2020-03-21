@@ -41,8 +41,9 @@ export default {
       Mitarbeiter: [
         {
           name: "Test Peter Hans Jürgen",
-          monat: "02-2020",
-          monatBestätigt: true,
+          monatBestätigt: [
+            {name:"2020-01", status: true},
+          ],
           events: [
             {
               name: "Urlaub",
