@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Scheduler :data="Mitarbeiter" :Blockierungen="Blockierungen"/>
+    <Scheduler :data="Mitarbeiter" :Blockierungen="Blockierungen" />
   </div>
 </template>
 
@@ -9,41 +9,54 @@ import Scheduler from "../components/Scheduler/Scheduler";
 
 export default {
   computed: {},
+  watch: {
+    Mitarbeiter: {
+      // This will let Vue know to look inside the array
+      deep: true,
+
+      // We have to move our method to a handler field
+      handler() {
+        console.log(this.Mitarbeiter);
+      }
+    }
+  },
   components: { Scheduler },
   data() {
     return {
-    Blockierungen: [
-      {
-        name: "Blockierung",
-        start: "2020-02-11",
-        end: "2020-02-14",
-        color: "#ff4500",
-        type: "Blockierung",
-        status: "bestätigt"
-      },
-      {
-        name: "Blockierung",
-        start: "2020-03-01",
-        end: "2020-03-04",
-        color: "#ff4500",
-        type: "Blockierung",
-        status: "bestätigt"
-      },      
-      {
-        name: "Blockierung",
-        start: "2020-03-11",
-        end: "2020-03-14",
-        color: "#ff4500",
-        type: "Blockierung",
-        status: "bestätigt"
-      },    
+      Blockierungen: [
+        {
+          name: "Blockierung",
+          start: "2020-02-11",
+          end: "2020-02-14",
+          color: "#ff4500",
+          type: "Blockierung",
+          status: "bestätigt"
+        },
+        {
+          name: "Blockierung",
+          start: "2020-03-01",
+          end: "2020-03-04",
+          color: "#ff4500",
+          type: "Blockierung",
+          status: "bestätigt"
+        },
+        {
+          name: "Blockierung",
+          start: "2020-03-11",
+          end: "2020-03-14",
+          color: "#ff4500",
+          type: "Blockierung",
+          status: "bestätigt"
+        }
       ],
       Mitarbeiter: [
         {
           name: "Test Peter Hans Jürgen",
-          monatBestätigt: [
-            {name:"2020-01", status: true},
-          ],
+          monatBestätigt: {
+            "2020-03": true,
+            "2020-04": true,
+            "2020-05": true
+          },
           events: [
             {
               name: "Urlaub",
@@ -121,7 +134,7 @@ export default {
         },
         {
           name: "Franzi von Olga",
-          monatBestätigt: true,
+          monatBestätigt: {},
           events: [
             {
               name: "Urlaub",
@@ -145,7 +158,7 @@ export default {
         },
         {
           name: "Brus von Olga",
-          monatBestätigt: true,
+          monatBestätigt: {},
           events: [
             {
               name: "Urlaub",
@@ -193,7 +206,7 @@ export default {
         },
         {
           name: "Jansen von Clash",
-          monatBestätigt: true,
+          monatBestätigt: {},
           events: [
             {
               name: "Urlaub",
@@ -239,7 +252,31 @@ export default {
             }
           ]
         },
-                {
+        {
+          name: "Jansen von Royale",
+          monatBestätigt: {},
+          events: [
+            {
+              name: "Urlaub",
+              start: "2020-02-05",
+              end: "2020-02-10",
+              color: "#C5C5C5",
+              type: "Abwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Urlaub"
+            },
+            {
+              name: "Arbeit",
+              start: "2020-02-20 06:00",
+              end: "2020-02-20 12:00",
+              color: "#C5C5C5",
+              type: "Anwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Arbeit"
+            }
+          ]
+        },
+        {
           name: "Jansen von Royale",
           monatBestätigt: true,
           events: [
@@ -263,7 +300,31 @@ export default {
             }
           ]
         },
-                {
+        {
+          name: "Jansen von Royale",
+          monatBestätigt: {},
+          events: [
+            {
+              name: "Urlaub",
+              start: "2020-02-05",
+              end: "2020-02-10",
+              color: "#C5C5C5",
+              type: "Abwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Urlaub"
+            },
+            {
+              name: "Arbeit",
+              start: "2020-02-20 06:00",
+              end: "2020-02-20 12:00",
+              color: "#C5C5C5",
+              type: "Anwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Arbeit"
+            }
+          ]
+        },
+        {
           name: "Jansen von Royale",
           monatBestätigt: true,
           events: [
@@ -287,7 +348,103 @@ export default {
             }
           ]
         },
-                {
+        {
+          name: "Jansen von Royale",
+          monatBestätigt: {},
+          events: [
+            {
+              name: "Urlaub",
+              start: "2020-02-05",
+              end: "2020-02-10",
+              color: "#C5C5C5",
+              type: "Abwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Urlaub"
+            },
+            {
+              name: "Arbeit",
+              start: "2020-02-20 06:00",
+              end: "2020-02-20 12:00",
+              color: "#C5C5C5",
+              type: "Anwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Arbeit"
+            }
+          ]
+        },
+        {
+          name: "Jansen von Royale",
+          monatBestätigt: {},
+          events: [
+            {
+              name: "Urlaub",
+              start: "2020-02-05",
+              end: "2020-02-10",
+              color: "#C5C5C5",
+              type: "Abwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Urlaub"
+            },
+            {
+              name: "Arbeit",
+              start: "2020-02-20 06:00",
+              end: "2020-02-20 12:00",
+              color: "#C5C5C5",
+              type: "Anwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Arbeit"
+            }
+          ]
+        },
+        {
+          name: "Jansen von Royale",
+          monatBestätigt: {},
+          events: [
+            {
+              name: "Urlaub",
+              start: "2020-02-05",
+              end: "2020-02-10",
+              color: "#C5C5C5",
+              type: "Abwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Urlaub"
+            },
+            {
+              name: "Arbeit",
+              start: "2020-02-20 06:00",
+              end: "2020-02-20 12:00",
+              color: "#C5C5C5",
+              type: "Anwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Arbeit"
+            }
+          ]
+        },
+        {
+          name: "Jansen von Royale",
+          monatBestätigt: {},
+          events: [
+            {
+              name: "Urlaub",
+              start: "2020-02-05",
+              end: "2020-02-10",
+              color: "#C5C5C5",
+              type: "Abwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Urlaub"
+            },
+            {
+              name: "Arbeit",
+              start: "2020-02-20 06:00",
+              end: "2020-02-20 12:00",
+              color: "#C5C5C5",
+              type: "Anwesenheit",
+              status: "angefragt",
+              abwesenheitsGrund: "Arbeit"
+            }
+          ]
+        },
+        {
           name: "Jansen von Royale",
           monatBestätigt: true,
           events: [
@@ -310,151 +467,7 @@ export default {
               abwesenheitsGrund: "Arbeit"
             }
           ]
-        },
-                {
-          name: "Jansen von Royale",
-          monatBestätigt: true,
-          events: [
-            {
-              name: "Urlaub",
-              start: "2020-02-05",
-              end: "2020-02-10",
-              color: "#C5C5C5",
-              type: "Abwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Urlaub"
-            },
-            {
-              name: "Arbeit",
-              start: "2020-02-20 06:00",
-              end: "2020-02-20 12:00",
-              color: "#C5C5C5",
-              type: "Anwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Arbeit"
-            }
-          ]
-        },
-                {
-          name: "Jansen von Royale",
-          monatBestätigt: true,
-          events: [
-            {
-              name: "Urlaub",
-              start: "2020-02-05",
-              end: "2020-02-10",
-              color: "#C5C5C5",
-              type: "Abwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Urlaub"
-            },
-            {
-              name: "Arbeit",
-              start: "2020-02-20 06:00",
-              end: "2020-02-20 12:00",
-              color: "#C5C5C5",
-              type: "Anwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Arbeit"
-            }
-          ]
-        },
-                {
-          name: "Jansen von Royale",
-          monatBestätigt: true,
-          events: [
-            {
-              name: "Urlaub",
-              start: "2020-02-05",
-              end: "2020-02-10",
-              color: "#C5C5C5",
-              type: "Abwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Urlaub"
-            },
-            {
-              name: "Arbeit",
-              start: "2020-02-20 06:00",
-              end: "2020-02-20 12:00",
-              color: "#C5C5C5",
-              type: "Anwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Arbeit"
-            }
-          ]
-        },
-                {
-          name: "Jansen von Royale",
-          monatBestätigt: true,
-          events: [
-            {
-              name: "Urlaub",
-              start: "2020-02-05",
-              end: "2020-02-10",
-              color: "#C5C5C5",
-              type: "Abwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Urlaub"
-            },
-            {
-              name: "Arbeit",
-              start: "2020-02-20 06:00",
-              end: "2020-02-20 12:00",
-              color: "#C5C5C5",
-              type: "Anwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Arbeit"
-            }
-          ]
-        },
-                {
-          name: "Jansen von Royale",
-          monatBestätigt: true,
-          events: [
-            {
-              name: "Urlaub",
-              start: "2020-02-05",
-              end: "2020-02-10",
-              color: "#C5C5C5",
-              type: "Abwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Urlaub"
-            },
-            {
-              name: "Arbeit",
-              start: "2020-02-20 06:00",
-              end: "2020-02-20 12:00",
-              color: "#C5C5C5",
-              type: "Anwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Arbeit"
-            }
-          ]
-        },
-                {
-          name: "Jansen von Royale",
-          monatBestätigt: true,
-          events: [
-            {
-              name: "Urlaub",
-              start: "2020-02-05",
-              end: "2020-02-10",
-              color: "#C5C5C5",
-              type: "Abwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Urlaub"
-            },
-            {
-              name: "Arbeit",
-              start: "2020-02-20 06:00",
-              end: "2020-02-20 12:00",
-              color: "#C5C5C5",
-              type: "Anwesenheit",
-              status: "angefragt",
-              abwesenheitsGrund: "Arbeit"
-            }
-          ]
-        },
+        }
       ]
     };
   }

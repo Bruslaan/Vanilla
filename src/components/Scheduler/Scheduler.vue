@@ -116,7 +116,7 @@
                 <v-col cols="3" class="pt-2 pb-2 ml-auto">
                   <v-checkbox
                     class="ma-0"
-                    v-model="element.monatBestätigt[findWithAttr(element.monatBestätigt, name, getCurrentYearAndMonth())].status"
+                    v-model="element.monatBestätigt[getCurrentYearAndMonth()]"            
                     color="success"
                     hide-details
                   ></v-checkbox>
