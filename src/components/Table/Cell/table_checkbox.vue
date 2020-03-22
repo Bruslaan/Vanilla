@@ -1,7 +1,7 @@
 <template>
   <td>
     <!-- <v-checkbox class="ma-0" v-model="mapping[name]" color="success" disabled hide-details></v-checkbox> -->
-    <input type="checkbox" v-model="mapping[name]" disabled id="vehicle1" name="vehicle1" value="Bike">
+    <input class="ml-1" type="checkbox" v-model="mapping[name]" disabled id="vehicle1" name="vehicle1" value="Bike">
   </td>
 </template>
 
@@ -20,8 +20,8 @@ export default {
 </script>
 
 <style scoped>
-td {
+/* td {
   text-align: center;
-}
+} */
 </style>
 

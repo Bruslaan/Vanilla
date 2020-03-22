@@ -166,7 +166,7 @@
     <!-- TABLE TOOLBAR -->
     <v-toolbar flat color="white">
       <v-toolbar-title>{{ title }}</v-toolbar-title>
-      <v-btn text class="mx-2" @click="switchFilterRow()">
+      <v-btn text fab small class="mx-2" @click="switchFilterRow()">
         <v-icon>mdi-filter-menu</v-icon>
       </v-btn>
       <v-text-field
@@ -176,6 +176,9 @@
         hide-details
         :onkeyup="searchFunction()"
       ></v-text-field>
+      <v-btn text fab small class="ml-2" @click="exportCSV()">
+        <v-icon>mdi-download</v-icon>
+      </v-btn>
     </v-toolbar>
     <!-- FILTER -->
     <v-expand-transition>
@@ -203,7 +206,7 @@
     <!-- TABLE CONTENT -->
     <v-simple-table fixed-header class="pt-1" height="80vh">
       <template v-slot:default>
-        <thead>
+        <thead id="myHead">
           <tr>
             <th
               class="text-left"
@@ -340,10 +343,69 @@ export default {
     }
   },
   methods: {
+    downloadFile(data, filename, mimetype = "text/csv") {
+      let csvFile;
+      let downloadLink;
+      // CSV file
+      csvFile = new Blob([data], { type: mimetype });
+      // Download link
+      downloadLink = document.createElement("a");
+      // File name
+      downloadLink.download = filename;
+      // Create a link to the file
+      downloadLink.href = window.URL.createObjectURL(csvFile);
+      // Hide download link
+      downloadLink.style.display = "none";
+      // Add the link to DOM
+      document.body.appendChild(downloadLink);
+      // Click download link
+      downloadLink.click();
+    },
+    exportCSV() {
+      let csv = [];
+      let header = document.getElementById("myHead");
+      let table = document.getElementById("myTable");
+      if (header && table) {
+        let head = header.getElementsByTagName("th");
+        let rows = table.getElementsByTagName("tr");
+        // let head = this.table.querySelectorAll("table th:not(.hidden)");
+        // let rows = this.table2.querySelectorAll("table tbody tr");
+        let row = [];
+        for (let j = 0; j < head.length - 1; j++) {
+          row.push(head[j].innerText);
+        }
+        csv.push(row.join(";"));
+        for (let i = 0; i < rows.length; i++) {
+          let row = [];
+          let cols = rows[i].querySelectorAll("td:not(.hidden)");
+          for (var j = 0; j < cols.length - 1; j++) {
+            console.log(cols[j]);
+            if (cols[j].children.length > 0) {
+              console.log("childer is da");
+              console.log(cols[j].children[0].type);
+              if (
+                cols[j].children[0].type == "checkbox" &&
+                cols[j].children[0].checked == true
+              ) {
+                row.push("x");
+              } else {
+                row.push("");
+              }
+            } else {
+              row.push(cols[j].innerText);
+            }
+          }
+          csv.push(row.join(";"));
+        }
+      }
+      console.log(csv);
+      // Download CSV file
+      this.downloadFile(csv.join("\n"), String(this.title));
+    },
     chechType(file) {
-      console.log(file)
+      console.log(file);
       if ((file.type == "image/jpeg") | (file.type == "image/png")) {
-        console.log("drinnen")
+        console.log("drinnen");
         return true;
       }
     },
@@ -396,10 +458,10 @@ export default {
             });
             vm.$mount();
             vm.$el.classList.add("protocolTD");
-            
+
             newTR.appendChild(vm.$el);
           }
-          
+
           // action buttons
           let extraTD = document.createElement("td");
           extraTD.classList.add("protocolTD");
