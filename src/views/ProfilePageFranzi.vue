@@ -1,13 +1,14 @@
 <script>
 import InformationenFranzi from "../components/InformationenFranzi";
 import Abwesenheit from "../components/Abwesenheit/Abwesenheit";
+import Anwesenheit from "../components/Anwesenheit/Anwesenheit";
 
 export default {
-  components: { InformationenFranzi, Abwesenheit },
+  components: { InformationenFranzi, Anwesenheit, Abwesenheit },
   data() {
     return {
       tab: null,
-      items: ["Info", "Anwesenheit", "Abwesenheit", "Rollen", "Vertrag"],
+      items: ["Info", "Anwesenheit", "Abwesenheit", "Dokumente", "Vertrag"],
       InfoFields: {
         Account: [
           {
@@ -384,7 +385,9 @@ export default {
         </v-tab-item>
         <v-tab-item>
           <v-card color="basil" flat>
-            <v-layout wrap class="pa-3 mt-5">TAB 2</v-layout>
+            <v-layout wrap class="pa-3 mt-5">
+              <Anwesenheit :events="events" :Arbeitszeit="VertragFields.Arbeitszeit"></Anwesenheit>
+            </v-layout>
           </v-card>
         </v-tab-item>
         <v-tab-item>
