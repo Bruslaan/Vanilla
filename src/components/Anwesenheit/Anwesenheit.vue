@@ -12,42 +12,57 @@
         <h1 class="ml-2">{{ title }} {{ title2 }}</h1>
       </v-row>
     </v-toolbar>
-
-    <v-row class="px-3" style="text-align: center;">
-      <v-col class="py-0" style="font-size: x-small;">MO</v-col>
-      <v-col class="py-0" style="font-size: x-small;">DI</v-col>
-      <v-col class="py-0" style="font-size: x-small;">MI</v-col>
-      <v-col class="py-0" style="font-size: x-small;">DO</v-col>
-      <v-col class="py-0" style="font-size: x-small;">FR</v-col>
-      <v-col class="py-0" style="font-size: x-small;">SA</v-col>
-      <v-col class="py-0" style="font-size: x-small;">SO</v-col>
+    <v-row>
+      <v-col cols="8" class="pr-0">
+        <v-card outlined class="py-4 pr-0">
+          <v-row class="px-3" style="text-align: center;">
+            <v-col class="py-0" style="font-size: x-small;">MO</v-col>
+            <v-col class="py-0" style="font-size: x-small;">DI</v-col>
+            <v-col class="py-0" style="font-size: x-small;">MI</v-col>
+            <v-col class="py-0" style="font-size: x-small;">DO</v-col>
+            <v-col class="py-0" style="font-size: x-small;">FR</v-col>
+            <v-col class="py-0" style="font-size: x-small;">SA</v-col>
+            <v-col class="py-0" style="font-size: x-small;">SO</v-col>
+          </v-row>
+          <v-row class="px-3" style="text-align: center;">
+            <v-col v-for="day of weekInfo" :key="day">{{day}}</v-col>
+          </v-row>
+          <v-sparkline
+            :value="value"
+            :gradient="['#f72047', '#ffd200', '#1feaea']"
+            :smooth="0"
+            :line-width="10"
+            :stroke-linecap="round"
+            gradient-direction="top"
+            type="bar"
+            :auto-line-width="false"
+            :show-labels="true"
+            :label-size="5"
+          >
+            <template v-slot:label="item">{{value[item.index]}} h</template>
+          </v-sparkline>
+        </v-card>
+      </v-col>
+      <v-col cols="4" class="pl-0">
+        <AbwesenheitCard
+          text1="Aktuelle Woche"
+          text2="Wochenstunden"
+          text3="Anzahl an gearbeiteten Stunden in dieser Woche"
+          :zahl1="summe(value)"
+          :zahl2="getWochenstunden()"
+          color1="#1feaea"
+        ></AbwesenheitCard>
+        <v-card outlined>lala2</v-card>
+      </v-col>
     </v-row>
-    <v-row class="px-3" style="text-align: center;">
-      <v-col v-for="day of weekInfo" :key="day">{{day}}</v-col>
-    </v-row>
-    <v-sparkline
-      :value="value"
-      :gradient="['#f72047', '#ffd200', '#1feaea']"
-      :smooth="0"
-      :line-width="10"
-      :stroke-linecap="round"
-      :gradient-direction="top"
-      type="bar"
-      :auto-line-width="false"
-      auto-draw
-      :show-labels="true"
-      :label-size="5"
-    >
-      <template v-slot:label="item">{{value[item.index]}}</template>
-    </v-sparkline>
   </div>
 </template>
 
 <script>
+import AbwesenheitCard from "../Abwesenheit/AbwesenheitCard";
 export default {
   data: () => ({
     currentDate: new Date(),
-    value: [8, 8, 5, 5, 0, 0, 0],
     monate: [
       "Januar",
       "Februar",
@@ -72,6 +87,9 @@ export default {
       type: Array,
       required: true
     }
+  },
+  components: {
+    AbwesenheitCard
   },
   computed: {
     title() {
@@ -113,11 +131,126 @@ export default {
 
         array.push(nextDay.getDate());
       }
-      console.log(array);
+    //   console.log(array);
       return array;
+    },
+    value() {
+      // Arbeit are all events of this week
+      let Arbeit = this.events.filter(
+        e => e.name === "Arbeit" && this.checkInside(e.start, e.end)
+      );
+
+      let hours = [];
+      for (let i = 0; i < 7; i++) {
+        // calculate date of Monday
+        let curr = new Date(this.currentDate);
+        let first = curr.getDate() - curr.getDay() + 1;
+        let firstday = new Date(curr.setDate(first));
+        let next = firstday.getDate() + i;
+        let nextDay = new Date(firstday.setDate(next));
+        let nextDate =
+          nextDay.getFullYear() +
+          "-" +
+          String(Number(nextDay.getMonth()) + 1).padStart(2, "0") +
+          "-" +
+          String(nextDay.getDate()).padStart(2, "0");
+
+        // console.log("nextdate", nextDate);
+
+        //find all events in Arbeit of monday
+        let Today = Arbeit.filter(e => e.start.split(" ")[0] == nextDate);
+
+        // console.log("today", Today);
+
+        let workingHours = 0;
+
+        for (let index = 0; index < Today.length; index++) {
+          let startTimeDecimal =
+            Number(Today[index]["start"].split(" ")[1].split(":")[0]) +
+            Number(Today[index]["start"].split(" ")[1].split(":")[1] / 60);
+          let endTimeDecimal =
+            Number(Today[index]["end"].split(" ")[1].split(":")[0]) +
+            Number(Today[index]["end"].split(" ")[1].split(":")[1] / 60);
+          if (workingHours == "") {
+            workingHours = endTimeDecimal - startTimeDecimal;
+          } else {
+            workingHours = workingHours + (endTimeDecimal - startTimeDecimal);
+          }
+        }
+
+        workingHours = parseFloat(workingHours.toFixed(2));
+
+        hours.push(workingHours);
+      }
+      console.log(hours);
+
+    //   console.log(Arbeit);
+      return hours;
     }
   },
   methods: {
+    summe(arr) {
+      return arr.reduce(function(a, b) {
+        return a + b;
+      }, 0);
+    },
+    getWochenstunden() {
+      let Wochenstunden = this.Arbeitszeit.find(e => e.name === "Wochenstunden")
+        .value;
+      return Wochenstunden;
+    },
+    checkInside(startEvent, endEvent) {
+      let curr = new Date(this.currentDate);
+      let first = curr.getDate() - curr.getDay() + 1;
+      let firstDate = new Date(curr.setDate(first));
+      let startRef = new Date(
+        firstDate.getFullYear(),
+        firstDate.getMonth(),
+        firstDate.getDate()
+      );
+
+      let last = first + 6;
+      let lastRef = new Date(curr.setDate(last));
+      let endRef = new Date(
+        lastRef.getFullYear(),
+        lastRef.getMonth(),
+        lastRef.getDate()
+      );
+
+      startRef = Date.parse(startRef);
+      endRef = Date.parse(endRef);
+
+      let startYear = startEvent.split(" ")[0].split("-")[0];
+      let startMonth = startEvent.split(" ")[0].split("-")[1];
+      let startDay = startEvent.split(" ")[0].split("-")[2];
+      let startDate = new Date(
+        Number(startYear),
+        Number(startMonth) - 1,
+        Number(startDay)
+      );
+      startDate = Date.parse(startDate);
+
+      let endYear = endEvent.split(" ")[0].split("-")[0];
+      let endMonth = endEvent.split(" ")[0].split("-")[1];
+      let endDay = endEvent.split(" ")[0].split("-")[2];
+      let endDate = new Date(
+        Number(endYear),
+        Number(endMonth) - 1,
+        Number(endDay)
+      );
+      endDate = Date.parse(endDate);
+
+    //   console.log("ref", startRef, endRef);
+    //   console.log("event", startDate, endDate);
+
+      if (startDate >= startRef && startDate <= endRef) {
+        return true;
+      }
+      if (endDate >= startRef && endDate <= endRef) {
+        return true;
+      }
+      return false;
+    },
     start() {
       var curr = new Date(this.currentDate);
       var first = curr.getDate() - curr.getDay() + 1;

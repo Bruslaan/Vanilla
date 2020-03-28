@@ -211,6 +211,42 @@ export default {
       },
       events: [
         {
+          name: "Arbeit",
+          start: "2020-03-22 06:15",
+          end: "2020-03-22 12:00",
+          color: "#C5C5C5",
+          type: "Anwesenheit",
+          status: "angefragt",
+          abwesenheitsGrund: "Arbeit"
+        },
+        {
+          name: "Arbeit",
+          start: "2020-03-23 06:15",
+          end: "2020-03-23 12:00",
+          color: "#C5C5C5",
+          type: "Anwesenheit",
+          status: "angefragt",
+          abwesenheitsGrund: "Arbeit"
+        },
+        {
+          name: "Arbeit",
+          start: "2020-03-24 06:00",
+          end: "2020-03-24 09:00",
+          color: "#C5C5C5",
+          type: "Anwesenheit",
+          status: "angefragt",
+          abwesenheitsGrund: "Arbeit"
+        },
+        {
+          name: "Arbeit",
+          start: "2020-03-24 15:00",
+          end: "2020-03-24 16:00",
+          color: "#C5C5C5",
+          type: "Anwesenheit",
+          status: "angefragt",
+          abwesenheitsGrund: "Arbeit"
+        },
+        {
           name: "Urlaub",
           start: "2019-12-25",
           end: "2020-01-01",
