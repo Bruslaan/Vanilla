@@ -9,7 +9,7 @@
         <v-btn icon @click="nextWeek">
           <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
-        <h1 class="ml-2">{{ title }} {{ title2 }}</h1>
+        <h1 class="ml-2">KW {{getWeekNumber()}} - {{ title }} {{ title2 }}</h1>
       </v-row>
     </v-toolbar>
     <v-row>
@@ -52,7 +52,12 @@
           :zahl2="getWochenstunden()"
           color1="#1feaea"
         ></AbwesenheitCard>
-        <v-card outlined>lala2</v-card>
+        <UberstundenCard
+          text1="Gesamt"
+          text2="Überstunden"
+          text3="Anzahl an Überstunden insgesamt"
+          :value="getÜberstunden()"
+        ></UberstundenCard>
       </v-col>
     </v-row>
   </div>
@@ -60,6 +65,8 @@
 
 <script>
 import AbwesenheitCard from "../Abwesenheit/AbwesenheitCard";
+import UberstundenCard from "./ÜberstundenCard";
+
 export default {
   data: () => ({
     currentDate: new Date(),
@@ -89,7 +96,8 @@ export default {
     }
   },
   components: {
-    AbwesenheitCard
+    AbwesenheitCard,
+    UberstundenCard
   },
   computed: {
     title() {
@@ -131,7 +139,7 @@ export default {
 
         array.push(nextDay.getDate());
       }
-    //   console.log(array);
+      //   console.log(array);
       return array;
     },
     value() {
@@ -184,11 +192,16 @@ export default {
       }
       console.log(hours);
 
-    //   console.log(Arbeit);
+      //   console.log(Arbeit);
       return hours;
     }
   },
   methods: {
+    getÜberstunden() {
+      let Überstunden = this.Arbeitszeit.find(e => e.name === "Überstunden")
+        .value;
+      return Überstunden;
+    },
     summe(arr) {
       return arr.reduce(function(a, b) {
         return a + b;
@@ -240,8 +253,8 @@ export default {
       );
       endDate = Date.parse(endDate);
 
-    //   console.log("ref", startRef, endRef);
-    //   console.log("event", startDate, endDate);
+      //   console.log("ref", startRef, endRef);
+      //   console.log("event", startDate, endDate);
 
       if (startDate >= startRef && startDate <= endRef) {
         return true;
@@ -274,11 +287,13 @@ export default {
       end["day"] = lastday.getDate();
       return end;
     },
-    // getWeekNumber() {
-    //   let now = this.currentDate;
-    //   let onejan = new Date(now.getFullYear(), 0, 1);
-    //   return Math.ceil(((now - onejan) / 86400000 + onejan.getDay() + 1) / 7)
-    // },
+    getWeekNumber() {
+      let now = this.currentDate;
+      let onejan = new Date(now.getFullYear(), 0, 1);
+      return (
+        Math.ceil(((now - onejan) / 86400000 + onejan.getDay() + 1) / 7) - 1
+      );
+    },
     nextWeek() {
       var curr = new Date(this.currentDate);
       let next = curr.getDate() + 7;

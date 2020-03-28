@@ -118,7 +118,8 @@ export default {
             options: ["MO", "DI", "MI", "DO", "FR", "SA", "SO"],
             value: ["SA", "SO"]
           },
-          { name: "Wochenstunden", type: "number", value: "35" }
+          { name: "Wochenstunden", type: "number", value: "35" },
+          { name: "Überstunden", type: "number", value: "5" }
         ],
         Vergütung: [
           {
