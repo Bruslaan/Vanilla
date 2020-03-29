@@ -131,6 +131,7 @@
                     v-else
                     class="ma-0"
                     v-model="element.monatBestätigt[getCurrentYearAndMonth()]"
+                    @mousedown="checkboxClicked(element)"
                     color="success"
                     hide-details
                   ></v-checkbox>
@@ -227,6 +228,7 @@ export default {
     text: "",
     snackbar: false,
     currentDate: new Date(),
+    switch: false,
     lazyImage: require("@/assets/avatar-icon-png-9.jpg"),
     types: {
       Arbeit: "work",
@@ -244,6 +246,70 @@ export default {
     }
   },
   methods: {
+    checkboxClicked(el) {
+      if (this.switch == true) {
+        // diese funktion passiert bevor der key auf true gesetzt wird. deswegen alles umgekehrt
+        // console.log(el);
+        let refYear = String(this.currentDate.getFullYear());
+        let refMonth = String(this.currentDate.getMonth() + 1).padStart(2, "0");
+        let key = refYear + "-" + refMonth;
+        if (el.monatBestätigt[key] == true) {
+          // console.log("Monat wurde NICHT bestätigt");
+        } else {
+          // console.log("Monat wurde bestätigt");
+
+          // Arbeitszeitnachweis erstellen
+          let curr = this.currentDate;
+          // let startRefMonth = new Date(curr.getFullYear(), curr.getMonth(), 1)
+          // let endRefMonth = new Date(curr.getFullYear(), curr.getMonth(), 0)
+          let len = new Date(curr.getFullYear(), curr.getMonth(), 0).getDate();
+          // console.log(len);
+          let array = [];
+          let workingHours = 0;
+          for (let i = 1; i <= len; i++) {
+            let nowYear = curr.getFullYear();
+            let nowMonth = curr.getMonth() + 1;
+            let nowDay = i;
+            let workNow = el.events.filter(
+              e =>
+                e.name == "Arbeit" &&
+                Number(e.start.split(" ")[0].split("-")[0]) == nowYear &&
+                Number(e.start.split(" ")[0].split("-")[1]) == nowMonth &&
+                Number(e.start.split(" ")[0].split("-")[2]) == nowDay
+            );
+            // console.log(i);
+            // console.log(workNow);
+            workingHours = 0;
+            for (let j = 0; j < workNow.length; j++) {
+              let startTimeDecimal =
+                Number(workNow[j]["start"].split(" ")[1].split(":")[0]) +
+                Number(workNow[j]["start"].split(" ")[1].split(":")[1] / 60);
+              let endTimeDecimal =
+                Number(workNow[j]["end"].split(" ")[1].split(":")[0]) +
+                Number(workNow[j]["end"].split(" ")[1].split(":")[1] / 60);
+              if (workingHours == "") {
+                workingHours = endTimeDecimal - startTimeDecimal;
+              } else {
+                workingHours =
+                  workingHours + (endTimeDecimal - startTimeDecimal);
+              }
+            }
+            array.push(workingHours);
+          }
+          console.log(array);
+
+          // arbeitsevents von diesem monat getten
+          // (opt: diese auf bestätigt setzen)
+          // anzahl an soll arbeitsstunden für diesen Monat berechnen
+          ///// dies kann man über die wochentstunden durch wochentage teilen das ist dann pro arbeitstag? oder wie genau macht man das?
+          // anzahl an ist arbeitsstunden für diesen Monat berechnen
+          // die differenz sind die überstunden und diese sollen in das überstunden value geupdated werden
+          this.switch = false;
+        }
+      } else {
+        this.switch = true;
+      }
+    },
     findWithAttr(array, attr, value) {
       for (var i = 0; i < array.length; i += 1) {
         if (array[i][attr] === value) {
@@ -252,33 +318,6 @@ export default {
       }
       return -1;
     },
-    // manageCheckbox(element) {
-    //   // if checkbox was set to TRUE
-    //   console.log("before", element.events);
-    //   if (element.monatBestätigt[this.getCurrentYearAndMonth()] == true) {
-    //     let workEvents = element.events.filter(e => e.type === "Anwesenheit");
-
-    //     let refYear = this.currentDate.getFullYear();
-    //     let refMonth = this.currentDate.getMonth() + 1;
-
-    //     for (let event of workEvents) {
-    //       let startYear = Number(event.start.split("-")[0]);
-    //       let endYear = Number(event.end.split("-")[0]);
-    //       let startMonth = Number(event.start.split("-")[1]);
-    //       let endMonth = Number(event.end.split("-")[1]);
-
-    //       if (
-    //         startYear == refYear &&
-    //         startMonth == refMonth &&
-    //         endYear == refYear && endMonth == refMonth
-    //       ) {
-    //         event.status == "bestätigt";
-    //         console.log("drinnen in der olga")
-    //       }
-    //     }
-    //     console.log("after", element.events);
-    //   }
-    // },
     checkIfEventsAreValid(element) {
       let validEvents = element.events.filter(
         e =>

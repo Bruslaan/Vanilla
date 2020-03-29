@@ -210,6 +210,11 @@ export default {
           }
         ]
       },
+      monatBestätigt: {
+        "2020-03": true,
+        "2020-04": true,
+        "2020-05": true
+      },
       events: [
         {
           name: "Arbeit",
@@ -423,7 +428,7 @@ export default {
         <v-tab-item>
           <v-card color="basil" flat>
             <v-layout wrap class="pa-3 mt-5">
-              <Anwesenheit :events="events" :Arbeitszeit="VertragFields.Arbeitszeit"></Anwesenheit>
+              <Anwesenheit :events="events" :Arbeitszeit="VertragFields.Arbeitszeit" :monat="monatBestätigt"></Anwesenheit>
             </v-layout>
           </v-card>
         </v-tab-item>

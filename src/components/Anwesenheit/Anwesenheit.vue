@@ -1,19 +1,40 @@
 <template>
   <div style="width: 100%;">
-    <v-toolbar flat color="white">
-      <v-row align="center">
-        <v-btn icon @click="prevWeek">
-          <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
-        <v-btn @click="heute" text>Heute</v-btn>
-        <v-btn icon @click="nextWeek">
-          <v-icon>mdi-chevron-right</v-icon>
-        </v-btn>
-        <h1 class="ml-2">KW {{getWeekNumber()}} - {{ title }} {{ title2 }}</h1>
-      </v-row>
-    </v-toolbar>
+    <v-row class="mx-1">
+      <v-toolbar flat color="white">
+        <v-row align="center">
+          <v-btn icon @click="prevWeek">
+            <v-icon>mdi-chevron-left</v-icon>
+          </v-btn>
+          <v-btn @click="heute" text>Heute</v-btn>
+          <v-btn icon @click="nextWeek">
+            <v-icon>mdi-chevron-right</v-icon>
+          </v-btn>
+          <h1 class="ml-2">
+            KW {{getWeekNumber()}}: {{ title }}
+            <v-chip
+              v-if="ifMonatBestätigt(start())"
+              style="vertical-align: text-bottom;"
+              class="ma-2 ml-1"
+              small
+              color="green"
+              text-color="white"
+            >Bestätigt</v-chip>
+            {{ title2 }}
+            <v-chip
+              v-if="ifMonatBestätigt(end())"
+              style="vertical-align: text-bottom;"
+              class="ma-2 ml-1"
+              small
+              color="green"
+              text-color="white"
+            >Bestätigt</v-chip>
+          </h1>
+        </v-row>
+      </v-toolbar>
+    </v-row>
     <v-row>
-      <v-col cols="8" class="pr-0">
+      <v-col cols="12" sm="12" md="8" class="pr-0">
         <v-card outlined class="py-4 pr-0">
           <v-row class="px-3" style="text-align: center;">
             <v-col class="py-0" style="font-size: x-small;">MO</v-col>
@@ -43,7 +64,7 @@
           </v-sparkline>
         </v-card>
       </v-col>
-      <v-col cols="4" class="pl-0">
+      <v-col cols="12" sm="12" md="4" class="pl-0">
         <AbwesenheitCard
           text1="Aktuelle Woche"
           text2="Wochenstunden"
@@ -52,12 +73,12 @@
           :zahl2="getWochenstunden()"
           color1="#1feaea"
         ></AbwesenheitCard>
-        <UberstundenCard
+        <!-- <UberstundenCard
           text1="Gesamt"
           text2="Überstunden"
-          text3="Anzahl an Überstunden insgesamt"
+          text3="Anzahl an bestätigten Überstunden insgesamt"
           :value="getÜberstunden()"
-        ></UberstundenCard>
+        ></UberstundenCard>-->
       </v-col>
     </v-row>
   </div>
@@ -65,7 +86,7 @@
 
 <script>
 import AbwesenheitCard from "../Abwesenheit/AbwesenheitCard";
-import UberstundenCard from "./ÜberstundenCard";
+// import UberstundenCard from "./ÜberstundenCard";
 
 export default {
   data: () => ({
@@ -93,11 +114,15 @@ export default {
     Arbeitszeit: {
       type: Array,
       required: true
+    },
+    monat: {
+      type: Object,
+      required: true
     }
   },
   components: {
-    AbwesenheitCard,
-    UberstundenCard
+    AbwesenheitCard
+    // UberstundenCard
   },
   computed: {
     title() {
@@ -133,13 +158,15 @@ export default {
       for (let i = 0; i < 7; i++) {
         var curr = new Date(this.currentDate);
         var first = curr.getDate() - curr.getDay() + 1;
+        if (curr.getDay() == 0) {
+          first = curr.getDate() - 7 + 1;
+        }
         var firstday = new Date(curr.setDate(first));
         let next = firstday.getDate() + i;
         var nextDay = new Date(firstday.setDate(next));
 
         array.push(nextDay.getDate());
       }
-      //   console.log(array);
       return array;
     },
     value() {
@@ -153,6 +180,9 @@ export default {
         // calculate date of Monday
         let curr = new Date(this.currentDate);
         let first = curr.getDate() - curr.getDay() + 1;
+        if (curr.getDay() == 0) {
+          first = curr.getDate() - 7 + 1;
+        }
         let firstday = new Date(curr.setDate(first));
         let next = firstday.getDate() + i;
         let nextDay = new Date(firstday.setDate(next));
@@ -190,13 +220,44 @@ export default {
 
         hours.push(workingHours);
       }
-      console.log(hours);
+      //   console.log(hours);
 
       //   console.log(Arbeit);
       return hours;
     }
   },
   methods: {
+    ifMonatBestätigt(datum) {
+      if (datum) {
+        let key = "";
+        const endMonth = this.end().month + 1;
+        const startMonth = this.start().month + 1;
+        // console.log(datum);
+        // console.log(this.start());
+        if (datum.day == this.start().day) {
+          //   console.log("in der olga");
+          const Year = String(this.start().year);
+          const Month = String(this.start().month + 1).padStart(2, "0");
+          key = Year + "-" + Month;
+          //   console.log(key);
+          if (this.monat[key] == true) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+        if (datum.day == this.end().day && startMonth != endMonth) {
+          const Year = String(this.end().year);
+          const Month = String(this.end().month + 1).padStart(2, "0");
+          key = Year + "-" + Month;
+          if (this.monat[key] == true) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      }
+    },
     getÜberstunden() {
       let Überstunden = this.Arbeitszeit.find(e => e.name === "Überstunden")
         .value;
@@ -215,6 +276,9 @@ export default {
     checkInside(startEvent, endEvent) {
       let curr = new Date(this.currentDate);
       let first = curr.getDate() - curr.getDay() + 1;
+      if (curr.getDay() == 0) {
+        first = curr.getDate() - 7 + 1;
+      }
       let firstDate = new Date(curr.setDate(first));
       let startRef = new Date(
         firstDate.getFullYear(),
@@ -267,6 +331,9 @@ export default {
     start() {
       var curr = new Date(this.currentDate);
       var first = curr.getDate() - curr.getDay() + 1;
+      if (curr.getDay() == 0) {
+        first = curr.getDate() - 7 + 1;
+      }
       var firstday = new Date(curr.setDate(first));
 
       let start = {};
@@ -278,6 +345,9 @@ export default {
     end() {
       var curr = new Date(this.currentDate);
       var first = curr.getDate() - curr.getDay() + 1;
+      if (curr.getDay() == 0) {
+        first = curr.getDate() - 7 + 1;
+      }
       var last = first + 6;
       var lastday = new Date(curr.setDate(last));
 
