@@ -720,9 +720,9 @@ export default {
             "Achtung! An diesem Tag ist eine Blockierung eingetragen!";
           this.snackbar = true;
         }
-        this.events.push(updatedEvent);
-        this.clearAndCloseModal();
       }
+      this.events.push(updatedEvent);
+      this.clearAndCloseModal();
     }
   }
 };

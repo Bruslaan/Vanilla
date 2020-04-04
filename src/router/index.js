@@ -110,6 +110,18 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/stundenplan',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Stundenplan',
+        component: () => import('../views/Stundenplan'),
+        meta: { title: 'Stundenplan', icon: 'mdi-calendar-text' }
+      }
+    ]
+  },
   // {
   //   path: '/anwesenheit',
   //   component: Layout,
