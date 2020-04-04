@@ -248,24 +248,18 @@ export default {
   methods: {
     checkboxClicked(el) {
       if (this.switch == true) {
-        // diese funktion passiert bevor der key auf true gesetzt wird. deswegen alles umgekehrt
-        // console.log(el);
         let refYear = String(this.currentDate.getFullYear());
         let refMonth = String(this.currentDate.getMonth() + 1).padStart(2, "0");
         let key = refYear + "-" + refMonth;
         if (el.monatBestätigt[key] == true) {
-          // console.log("Monat wurde NICHT bestätigt");
+          // console.log("monat wurde nicht bestätigt")
         } else {
-          // console.log("Monat wurde bestätigt");
-
-          // Arbeitszeitnachweis erstellen
           let curr = this.currentDate;
-          // let startRefMonth = new Date(curr.getFullYear(), curr.getMonth(), 1)
-          // let endRefMonth = new Date(curr.getFullYear(), curr.getMonth(), 0)
           let len = new Date(curr.getFullYear(), curr.getMonth(), 0).getDate();
-          // console.log(len);
-          let array = [];
+          let month_work_array = [];
+          let month_abwesenheit_array = [];
           let workingHours = 0;
+          // iterate whole month:
           for (let i = 1; i <= len; i++) {
             let nowYear = curr.getFullYear();
             let nowMonth = curr.getMonth() + 1;
@@ -277,8 +271,7 @@ export default {
                 Number(e.start.split(" ")[0].split("-")[1]) == nowMonth &&
                 Number(e.start.split(" ")[0].split("-")[2]) == nowDay
             );
-            // console.log(i);
-            // console.log(workNow);
+            // kumulative working hours current day:
             workingHours = 0;
             for (let j = 0; j < workNow.length; j++) {
               let startTimeDecimal =
@@ -294,9 +287,35 @@ export default {
                   workingHours + (endTimeDecimal - startTimeDecimal);
               }
             }
-            array.push(workingHours);
+            // push working hours of current day to month array:
+            month_work_array.push(workingHours);
+
+            // abwesenheit
+            let abwesenheiten = el.events.filter(e => e.type == "Abwesenheit");
+
+            let n = new Date(curr.getFullYear(), curr.getMonth(), nowDay);
+            n = Date.parse(n);
+            let found = 0
+            for (let index = 0; index < abwesenheiten.length; index++) {
+              let startTime = this.toMilliseconds(
+                abwesenheiten[index]["start"] + " 00:00"
+              );
+              let endTime = this.toMilliseconds(
+                abwesenheiten[index]["end"] + " 00:00"
+              );
+              if (n >= startTime && n <= endTime) {
+                // event found
+                found = 1
+                month_abwesenheit_array.push(abwesenheiten[index].name);
+              }
+            }
+            if (found == 0) {
+              month_abwesenheit_array.push("");
+            } 
+            found = 0
           }
-          console.log(array);
+          console.log(month_work_array);
+          console.log(month_abwesenheit_array);
 
           // arbeitsevents von diesem monat getten
           // (opt: diese auf bestätigt setzen)
